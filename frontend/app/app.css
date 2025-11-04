@@ -1,0 +1,10 @@
+@import "tailwindcss";
+
+@source "../app/**/*.{html,jsx,tsx}";
+@source "../node_modules/@rewind-ui/core/dist/theme/styles/*.js";
+
+html, body, #root {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}

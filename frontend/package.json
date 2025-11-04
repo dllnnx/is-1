@@ -1,0 +1,40 @@
+{
+  "name": "frontend",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite",
+    "start": "vite preview",
+    "typecheck": "tsc",
+    "gen": "rtk-query-codegen-openapi gen-config.json"
+  },
+  "dependencies": {
+    "@reduxjs/toolkit": "^2.9.2",
+    "@rewind-ui/core": "^0.20.0",
+    "@rtk-query/codegen-openapi": "^2.1.0",
+    "@tailwindcss/forms": "^0.5.10",
+    "@tailwindcss/typography": "^0.5.19",
+    "@tippyjs/react": "^4.2.6",
+    "bootstrap-icons": "^1.13.1",
+    "class-variance-authority": "^0.7.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-hot-toast": "^2.6.0",
+    "react-redux": "^9.2.0",
+    "react-router-dom": "^6.28.0",
+    "tailwind-merge": "^3.3.1",
+    "tailwind-scrollbar": "^4.0.2"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.1.15",
+    "@types/node": "^22",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "tailwindcss": "^4.1.15",
+    "typescript": "^5.9.2",
+    "vite": "^7.1.7",
+    "vite-tsconfig-paths": "^5.1.4"
+  }
+}
