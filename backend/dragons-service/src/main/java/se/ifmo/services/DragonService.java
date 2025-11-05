@@ -7,6 +7,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import se.ifmo.gen.model.*;
 import se.ifmo.models.*;
 import se.ifmo.models.Color;
@@ -184,6 +185,44 @@ public class DragonService {
             return true;
         }
         return false;
+    }
+
+    @Transactional
+    public boolean reassignAndDelete(Long dragonIdToDelete, Integer newOwnerDragonId) {
+        Optional<DragonEntity> dragonToDeleteOpt = dragonRepository.findById(dragonIdToDelete);
+        if (dragonToDeleteOpt.isEmpty()) {
+            return false;
+        }
+        DragonEntity dragonToDelete = dragonToDeleteOpt.get();
+
+        Optional<DragonEntity> newOwnerOpt = dragonRepository.findById(newOwnerDragonId.longValue());
+        if (newOwnerOpt.isEmpty()) {
+            return false;
+        }
+        DragonEntity newOwner = newOwnerOpt.get();
+
+        if (dragonToDelete.getId().equals(newOwner.getId())) {
+            return false;
+        }
+
+        if (dragonToDelete.getKiller() != null) {
+            newOwner.setKiller(dragonToDelete.getKiller());
+        }
+        if (dragonToDelete.getCoordinatesEntity() != null) {
+            newOwner.setCoordinatesEntity(dragonToDelete.getCoordinatesEntity());
+        }
+        if (dragonToDelete.getCave() != null) {
+            newOwner.setCave(dragonToDelete.getCave());
+        }
+        if (dragonToDelete.getHead() != null) {
+            newOwner.setHead(dragonToDelete.getHead());
+        }
+
+        dragonRepository.save(newOwner);
+
+        dragonRepository.delete(dragonToDelete);
+
+        return true;
     }
 
     public Optional<DragonEntity> update(Dragon dragon) {

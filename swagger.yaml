@@ -808,18 +808,18 @@ paths:
             type: integer
             format: int32
       requestBody:
-        description: IDs of dragon to reassign dependencies to.
+        description: IDs of dragons to reassign dependencies to.
         required: true
         content:
           application/json:
             schema:
               type: object
+              required: [ newOwnerId ]
               properties:
-                newKillerOwnerId:
+                newOwnerId:
                   type: integer
                   format: int32
-                  description: "ID of the dragon to which the killer should be reassigned, if the killer becomes orphaned."
-                  nullable: true
+                  description: "ID of the dragon to which all dependencies (killer, cave, coordinates, head) will be reassigned."
       responses:
         204:
           description: Successfully deleted

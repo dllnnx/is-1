@@ -1,8 +1,8 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import Tippy from '@tippyjs/react';
 import {
     type Color,
-    type CoordinatesFilter,
+    type CoordinatesFilter, Dragon,
     type DragonCaveFilter,
     type DragonCharacter,
     type DragonFilter,
@@ -13,8 +13,10 @@ import {
     type PersonFilter,
     type SortingColumn,
     type SortingDirection,
-    useGetDragonsQuery,
+    useGetDragonsQuery, useReassignAndDeleteDragonMutation,
 } from "~/gen/types.generated";
+import toast from "react-hot-toast";
+import {DeleteDragonModal} from "~/components/DeleteDragonModal";
 
 const TooltipContent = ({killer}: { killer: Person }) => (
     <div className="space-y-1 text-left">
@@ -74,6 +76,11 @@ export const TablePage = () => {
     const [currentPage, setCurrentPage] = useState(0);
     const [pageSize, setPageSize] = useState(10);
 
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [dragonToDelete, setDragonToDelete] = useState<Dragon | null>(null);
+
+    const [reassignAndDelete, { isLoading: isDeleting }] = useReassignAndDeleteDragonMutation();
+
     const hasActiveFilters = Object.keys(filterDragon).some(key => {
         const value = filterDragon[key as keyof DragonFilter];
         return value !== undefined && value !== null && value !== "";
@@ -90,7 +97,12 @@ export const TablePage = () => {
         },
     };
 
-    const {data, error, isLoading} = useGetDragonsQuery(getDragonApiArg);
+    const {data, error, isLoading, refetch: refetchDragons} = useGetDragonsQuery(getDragonApiArg);
+
+    useEffect(() => {
+        const intervalId = setInterval(refetchDragons, 1000)
+        return () => clearInterval(intervalId)
+    }, [refetchDragons])
 
     const handleSort = (column: SortingColumn) => {
         if (sortColumn === column) {
@@ -138,6 +150,38 @@ export const TablePage = () => {
 
     const handleNextPage = () => {
         setCurrentPage(prev => Math.min(totalPages - 1, prev + 1));
+    };
+
+    const handleDeleteClick = (dragon: Dragon) => {
+        setDragonToDelete(dragon);
+        setIsDeleteModalOpen(true);
+    };
+
+    const handleCloseModal = () => {
+        setIsDeleteModalOpen(false);
+        setDragonToDelete(null);
+        refetchDragons();
+    };
+
+    const handleConfirmDelete = async (newOwnerId: number) => {
+        if (!dragonToDelete) return;
+
+        try {
+            await reassignAndDelete({
+                id: dragonToDelete.id,
+                body: {
+                    newOwnerId: newOwnerId
+                }
+            }).unwrap().then(refetchDragons);
+            toast.success(`Dragon ${dragonToDelete.name} deleted successfully!`);
+            handleCloseModal();
+            refetchDragons();
+        } catch (e) {
+            const apiError = e as { status: number; data: { message?: string } };
+            const errorMessage = apiError.data?.message || "Failed to process request.";
+            toast.error(errorMessage);
+            console.error(e);
+        }
     };
 
     if (isLoading) return <div className="p-4">Loading...</div>;
@@ -194,6 +238,7 @@ export const TablePage = () => {
                                 {getSortIndicator(col.key)}
                             </th>
                         ))}
+                        <th className="border border-gray-300 px-4 py-2">Actions</th>
                     </tr>
                     <tr className="bg-white">
                         <td className="border border-gray-300 px-2 py-2">
@@ -378,7 +423,6 @@ export const TablePage = () => {
                     <tbody>
                     {data && data.dragons && data.dragons.length > 0 ? (
                         data.dragons.map((dragon) => {
-                            console.log("Полученный с API дракон:", dragon);
                             const renderValue = (value: any): string | number | JSX.Element => {
                                 if (value === null || value === undefined) return "—";
                                 if (typeof value === "object") {
@@ -413,6 +457,14 @@ export const TablePage = () => {
                                             {typeof value === 'object' && value !== null && 'type' in value ? value : renderValue(value)}
                                         </td>
                                     ))}
+                                    <td className="border border-gray-300 px-4 py-2 text-center">
+                                        <button
+                                            onClick={() => handleDeleteClick(dragon)}
+                                            className="text-red-500 hover:text-red-700 font-semibold"
+                                        >
+                                            Delete
+                                        </button>
+                                    </td>
                                 </tr>
                             );
                         })
@@ -478,6 +530,13 @@ export const TablePage = () => {
                     </div>
                 </div>
             )}
+            <DeleteDragonModal
+                isOpen={isDeleteModalOpen}
+                onClose={handleCloseModal}
+                onConfirm={handleConfirmDelete}
+                dragonToDelete={dragonToDelete}
+                isLoading={isDeleting}
+            />
         </div>
     );
 };

@@ -1,6 +1,7 @@
 package se.ifmo.controllers;
 
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -21,6 +22,7 @@ public class DragonController implements DragonsApi {
     private final CoordinatesService coordinatesService;
     private final LocationService locationService;
     private final PersonService personService;
+    private final ModelMapper modelMapper;
 
     @Override
     public ResponseEntity<Dragon> getDragonById(Integer id) {
@@ -124,6 +126,15 @@ public class DragonController implements DragonsApi {
 
         if (success) {
             return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    @Override
+    public ResponseEntity<Void> reassignAndDeleteDragon(Integer id, ReassignAndDeleteDragonRequest request) {
+        boolean success = dragonService.reassignAndDelete(id.longValue(), modelMapper.map(request.getNewOwnerId(), Integer.class));
+        if (success) {
+            return ResponseEntity.noContent().build();
         }
         return ResponseEntity.notFound().build();
     }

@@ -1,23 +1,12 @@
 package se.ifmo.gen.model;
 
-import java.net.URI;
-import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import java.util.Arrays;
-import org.openapitools.jackson.nullable.JsonNullable;
-import org.springframework.lang.Nullable;
-import java.util.NoSuchElementException;
-import org.openapitools.jackson.nullable.JsonNullable;
-import java.time.OffsetDateTime;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
-
-
-import java.util.*;
 import jakarta.annotation.Generated;
+import jakarta.validation.constraints.NotNull;
+
+import java.util.Objects;
 
 /**
  * ReassignAndDeleteDragonRequest
@@ -27,26 +16,37 @@ import jakarta.annotation.Generated;
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", comments = "Generator version: 7.15.0")
 public class ReassignAndDeleteDragonRequest {
 
-  private JsonNullable<Integer> newKillerOwnerId = JsonNullable.<Integer>undefined();
+  private Integer newOwnerId;
 
-  public ReassignAndDeleteDragonRequest newKillerOwnerId(Integer newKillerOwnerId) {
-    this.newKillerOwnerId = JsonNullable.of(newKillerOwnerId);
+  public ReassignAndDeleteDragonRequest() {
+    super();
+  }
+
+  /**
+   * Constructor with only required parameters
+   */
+  public ReassignAndDeleteDragonRequest(Integer newOwnerId) {
+    this.newOwnerId = newOwnerId;
+  }
+
+  public ReassignAndDeleteDragonRequest newOwnerId(Integer newOwnerId) {
+    this.newOwnerId = newOwnerId;
     return this;
   }
 
   /**
-   * ID of the dragon to which the killer should be reassigned, if the killer becomes orphaned.
-   * @return newKillerOwnerId
+   * ID of the dragon to which all dependencies (killer, cave, coordinates, head) will be reassigned.
+   * @return newOwnerId
    */
-  
-  @Schema(name = "newKillerOwnerId", description = "ID of the dragon to which the killer should be reassigned, if the killer becomes orphaned.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("newKillerOwnerId")
-  public JsonNullable<Integer> getNewKillerOwnerId() {
-    return newKillerOwnerId;
+  @NotNull
+  @Schema(name = "newOwnerId", description = "ID of the dragon to which all dependencies (killer, cave, coordinates, head) will be reassigned.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("newOwnerId")
+  public Integer getNewOwnerId() {
+    return newOwnerId;
   }
 
-  public void setNewKillerOwnerId(JsonNullable<Integer> newKillerOwnerId) {
-    this.newKillerOwnerId = newKillerOwnerId;
+  public void setNewOwnerId(Integer newOwnerId) {
+    this.newOwnerId = newOwnerId;
   }
 
   @Override
@@ -58,30 +58,19 @@ public class ReassignAndDeleteDragonRequest {
       return false;
     }
     ReassignAndDeleteDragonRequest reassignAndDeleteDragonRequest = (ReassignAndDeleteDragonRequest) o;
-    return equalsNullable(this.newKillerOwnerId, reassignAndDeleteDragonRequest.newKillerOwnerId);
-  }
-
-  private static <T> boolean equalsNullable(JsonNullable<T> a, JsonNullable<T> b) {
-    return a == b || (a != null && b != null && a.isPresent() && b.isPresent() && Objects.deepEquals(a.get(), b.get()));
+    return Objects.equals(this.newOwnerId, reassignAndDeleteDragonRequest.newOwnerId);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(hashCodeNullable(newKillerOwnerId));
-  }
-
-  private static <T> int hashCodeNullable(JsonNullable<T> a) {
-    if (a == null) {
-      return 1;
-    }
-    return a.isPresent() ? Arrays.deepHashCode(new Object[]{a.get()}) : 31;
+    return Objects.hash(newOwnerId);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class ReassignAndDeleteDragonRequest {\n");
-    sb.append("    newKillerOwnerId: ").append(toIndentedString(newKillerOwnerId)).append("\n");
+    sb.append("    newOwnerId: ").append(toIndentedString(newOwnerId)).append("\n");
     sb.append("}");
     return sb.toString();
   }
@@ -97,4 +86,3 @@ public class ReassignAndDeleteDragonRequest {
     return o.toString().replace("\n", "\n    ");
   }
 }
-
