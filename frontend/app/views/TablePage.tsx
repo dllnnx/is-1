@@ -1,4 +1,5 @@
 import {useEffect, useState} from "react";
+import {useNavigate} from "react-router-dom";
 import Tippy from '@tippyjs/react';
 import {
     type Color,
@@ -17,6 +18,10 @@ import {
 } from "~/gen/types.generated";
 import toast from "react-hot-toast";
 import {DeleteDragonModal} from "~/components/DeleteDragonModal";
+import {UpdateDragonModal} from "~/components/UpdateDragonModal";
+import {AgeSumModal} from "~/components/AgeSumModal";
+import {MaxTypeDragonModal} from "~/components/MaxTypeDragonModal";
+import {DeepestCaveDragonModal} from "~/components/DeepestCaveDragonModal";
 
 const TooltipContent = ({killer}: { killer: Person }) => (
     <div className="space-y-1 text-left">
@@ -68,6 +73,7 @@ const KillerTooltip = ({killer}: { killer: Person }) => {
 };
 
 export const TablePage = () => {
+    const navigate = useNavigate();
     const [sortColumn, setSortColumn] = useState<SortingColumn>("ID");
     const [sortDirection, setSortDirection] = useState<SortingDirection>("ASC");
 
@@ -78,6 +84,13 @@ export const TablePage = () => {
 
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [dragonToDelete, setDragonToDelete] = useState<Dragon | null>(null);
+
+    const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+    const [dragonToUpdate, setDragonToUpdate] = useState<Dragon | null>(null);
+
+    const [isAgeSumModalOpen, setIsAgeSumModalOpen] = useState(false);
+    const [isMaxTypeModalOpen, setIsMaxTypeModalOpen] = useState(false);
+    const [isDeepestCaveModalOpen, setIsDeepestCaveModalOpen] = useState(false);
 
     const [reassignAndDelete, { isLoading: isDeleting }] = useReassignAndDeleteDragonMutation();
 
@@ -157,9 +170,42 @@ export const TablePage = () => {
         setIsDeleteModalOpen(true);
     };
 
-    const handleCloseModal = () => {
+    const handleDeleteMaxAge = async () => {
+        try {
+            const allDragonsResponse = await refetchDragons();
+            const allDragons = allDragonsResponse.data?.dragons;
+            
+            if (!allDragons || allDragons.length === 0) {
+                toast.error("No dragons available");
+                return;
+            }
+
+            const maxAgeDragon = allDragons.reduce((max, dragon) => {
+                return dragon.age > max.age ? dragon : max;
+            });
+
+            setDragonToDelete(maxAgeDragon);
+            setIsDeleteModalOpen(true);
+        } catch (error) {
+            toast.error("Failed to fetch dragons");
+            console.error(error);
+        }
+    };
+
+    const handleUpdateClick = (dragon: Dragon) => {
+        setDragonToUpdate(dragon);
+        setIsUpdateModalOpen(true);
+    };
+
+    const handleCloseDeleteModal = () => {
         setIsDeleteModalOpen(false);
         setDragonToDelete(null);
+        refetchDragons();
+    };
+
+    const handleCloseUpdateModal = () => {
+        setIsUpdateModalOpen(false);
+        setDragonToUpdate(null);
         refetchDragons();
     };
 
@@ -174,7 +220,7 @@ export const TablePage = () => {
                 }
             }).unwrap().then(refetchDragons);
             toast.success(`Dragon ${dragonToDelete.name} deleted successfully!`);
-            handleCloseModal();
+            handleCloseDeleteModal();
             refetchDragons();
         } catch (e) {
             const apiError = e as { status: number; data: { message?: string } };
@@ -200,13 +246,46 @@ export const TablePage = () => {
         <div className="p-4">
             <div className="flex justify-between items-center mb-4">
                 <h1 className="text-2xl font-bold">Dragons</h1>
-                <button
-                    onClick={clearAllFilters}
-                    disabled={!hasActiveFilters}
-                    className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                    Clear All Filters
-                </button>
+                <div className="flex gap-3">
+                    <button
+                        onClick={() => navigate("/create")}
+                        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                    >
+                        Create Dragon
+                    </button>
+                    <button
+                        onClick={() => setIsAgeSumModalOpen(true)}
+                        className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+                    >
+                        Age Sum
+                    </button>
+                    <button
+                        onClick={() => setIsMaxTypeModalOpen(true)}
+                        className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
+                    >
+                        Show with Max Type
+                    </button>
+                    <button
+                        onClick={() => setIsDeepestCaveModalOpen(true)}
+                        className="px-4 py-2 bg-teal-600 text-white rounded hover:bg-teal-700"
+                    >
+                        Show in the Deepest Cave
+                    </button>
+                    <button
+                        onClick={handleDeleteMaxAge}
+                        disabled={!data?.dragons || data.dragons.length === 0}
+                        className="px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        Delete with Max Age
+                    </button>
+                    <button
+                        onClick={clearAllFilters}
+                        disabled={!hasActiveFilters}
+                        className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        Clear All Filters
+                    </button>
+                </div>
             </div>
 
             <div className="overflow-x-auto">
@@ -458,12 +537,20 @@ export const TablePage = () => {
                                         </td>
                                     ))}
                                     <td className="border border-gray-300 px-4 py-2 text-center">
-                                        <button
-                                            onClick={() => handleDeleteClick(dragon)}
-                                            className="text-red-500 hover:text-red-700 font-semibold"
-                                        >
-                                            Delete
-                                        </button>
+                                        <div className="flex gap-3 justify-center">
+                                            <button
+                                                onClick={() => handleUpdateClick(dragon)}
+                                                className="text-blue-500 hover:text-blue-700 font-semibold"
+                                            >
+                                                Update
+                                            </button>
+                                            <button
+                                                onClick={() => handleDeleteClick(dragon)}
+                                                className="text-red-500 hover:text-red-700 font-semibold"
+                                            >
+                                                Delete
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             );
@@ -532,10 +619,27 @@ export const TablePage = () => {
             )}
             <DeleteDragonModal
                 isOpen={isDeleteModalOpen}
-                onClose={handleCloseModal}
+                onClose={handleCloseDeleteModal}
                 onConfirm={handleConfirmDelete}
                 dragonToDelete={dragonToDelete}
                 isLoading={isDeleting}
+            />
+            <UpdateDragonModal
+                isOpen={isUpdateModalOpen}
+                onClose={handleCloseUpdateModal}
+                dragonToUpdate={dragonToUpdate}
+            />
+            <AgeSumModal
+                isOpen={isAgeSumModalOpen}
+                onClose={() => setIsAgeSumModalOpen(false)}
+            />
+            <MaxTypeDragonModal
+                isOpen={isMaxTypeModalOpen}
+                onClose={() => setIsMaxTypeModalOpen(false)}
+            />
+            <DeepestCaveDragonModal
+                isOpen={isDeepestCaveModalOpen}
+                onClose={() => setIsDeepestCaveModalOpen(false)}
             />
         </div>
     );

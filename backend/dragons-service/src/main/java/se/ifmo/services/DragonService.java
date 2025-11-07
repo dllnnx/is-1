@@ -225,6 +225,7 @@ public class DragonService {
         return true;
     }
 
+    @Transactional
     public Optional<DragonEntity> update(Dragon dragon) {
         return dragonRepository.findById(dragon.getId().longValue())
                 .map(existingDragon -> {
@@ -239,9 +240,15 @@ public class DragonService {
                                 modelMapper.map(dragon.getCoordinates(), CoordinatesEntity.class)
                         );
                     } else {
-                        coordinatesEntity = coordinatesRepository.getReferenceById(
+                        coordinatesEntity = coordinatesRepository.findById(
                                 dragon.getCoordinates().getId().longValue()
-                        );
+                        ).orElseGet(() -> {
+                            CoordinatesEntity newEntity = modelMapper.map(dragon.getCoordinates(), CoordinatesEntity.class);
+                            return coordinatesRepository.save(newEntity);
+                        });
+                        coordinatesEntity.setX(dragon.getCoordinates().getX());
+                        coordinatesEntity.setY(dragon.getCoordinates().getY());
+                        coordinatesEntity = coordinatesRepository.save(coordinatesEntity);
                     }
                     existingDragon.setCoordinatesEntity(coordinatesEntity);
 
@@ -251,9 +258,15 @@ public class DragonService {
                                 modelMapper.map(dragon.getCave(), DragonCaveEntity.class)
                         );
                     } else {
-                        dragonCaveEntity = dragonCaveRepository.getReferenceById(
+                        dragonCaveEntity = dragonCaveRepository.findById(
                                 dragon.getCave().getId().longValue()
-                        );
+                        ).orElseGet(() -> {
+                            DragonCaveEntity newEntity = modelMapper.map(dragon.getCave(), DragonCaveEntity.class);
+                            return dragonCaveRepository.save(newEntity);
+                        });
+                        dragonCaveEntity.setDepth(dragon.getCave().getDepth());
+                        dragonCaveEntity.setNumberOfTreasures(dragon.getCave().getNumberOfTreasures());
+                        dragonCaveEntity = dragonCaveRepository.save(dragonCaveEntity);
                     }
                     existingDragon.setCave(dragonCaveEntity);
 
@@ -263,13 +276,83 @@ public class DragonService {
                         } else {
                             PersonEntity personEntity;
                             if (dragon.getKiller().get().getId() == null) {
-                                personEntity = personRepository.save(
-                                        modelMapper.map(dragon.getKiller().get(), PersonEntity.class)
-                                );
+                                PersonEntity transientPerson = modelMapper.map(dragon.getKiller().get(), PersonEntity.class);
+                                if (transientPerson.getLocationEntity() != null && transientPerson.getLocationEntity().getId() == null) {
+                                    LocationEntity savedLocation = locationRepository.save(transientPerson.getLocationEntity());
+                                    transientPerson.setLocationEntity(savedLocation);
+                                } else if (transientPerson.getLocationEntity() != null && transientPerson.getLocationEntity().getId() != null) {
+                                    LocationEntity locationEntity = locationRepository.findById(
+                                            transientPerson.getLocationEntity().getId()
+                                    ).orElseGet(() -> {
+                                        LocationEntity newEntity = modelMapper.map(transientPerson.getLocationEntity(), LocationEntity.class);
+                                        return locationRepository.save(newEntity);
+                                    });
+                                    if (dragon.getKiller().get().getLocation().isPresent() && dragon.getKiller().get().getLocation().get() != null) {
+                                        Location location = dragon.getKiller().get().getLocation().get();
+                                        locationEntity.setX(location.getX());
+                                        locationEntity.setY(location.getY());
+                                        if (location.getName().isPresent()) {
+                                            locationEntity.setName(location.getName().get());
+                                        } else {
+                                            locationEntity.setName(null);
+                                        }
+                                        locationEntity = locationRepository.save(locationEntity);
+                                    }
+                                    transientPerson.setLocationEntity(locationEntity);
+                                }
+                                personEntity = personRepository.save(transientPerson);
                             } else {
-                                personEntity = personRepository.getReferenceById(
+                                personEntity = personRepository.findById(
                                         dragon.getKiller().get().getId().longValue()
-                                );
+                                ).orElseGet(() -> {
+                                    PersonEntity newEntity = modelMapper.map(dragon.getKiller().get(), PersonEntity.class);
+                                    return personRepository.save(newEntity);
+                                });
+                                personEntity.setName(dragon.getKiller().get().getName());
+                                personEntity.setEyeColor(modelMapper.map(dragon.getKiller().get().getEyeColor(), Color.class));
+                                personEntity.setHairColor(dragon.getKiller().get().getHairColor() != null ?
+                                        modelMapper.map(dragon.getKiller().get().getHairColor(), Color.class) : null);
+                                personEntity.setWeight(dragon.getKiller().get().getWeight());
+                                if (dragon.getKiller().get().getHeight().isPresent()) {
+                                    personEntity.setHeight(dragon.getKiller().get().getHeight().get());
+                                } else {
+                                    personEntity.setHeight(null);
+                                }
+                                personEntity.setPassportId(dragon.getKiller().get().getPassportID());
+
+                                if (dragon.getKiller().get().getLocation().isPresent()) {
+                                    if (dragon.getKiller().get().getLocation().get() == null) {
+                                        personEntity.setLocationEntity(null);
+                                    } else {
+                                        Location location = dragon.getKiller().get().getLocation().get();
+                                        if (location.getId() == null) {
+                                            LocationEntity newLocation = locationRepository.save(
+                                                    modelMapper.map(location, LocationEntity.class)
+                                            );
+                                            personEntity.setLocationEntity(newLocation);
+                                        } else {
+                                            LocationEntity locationEntity = locationRepository.findById(
+                                                    location.getId().longValue()
+                                            ).orElseGet(() -> {
+                                                LocationEntity newEntity = modelMapper.map(location, LocationEntity.class);
+                                                return locationRepository.save(newEntity);
+                                            });
+                                            locationEntity.setX(location.getX());
+                                            locationEntity.setY(location.getY());
+                                            if (location.getName().isPresent()) {
+                                                locationEntity.setName(location.getName().get());
+                                            } else {
+                                                locationEntity.setName(null);
+                                            }
+                                            locationEntity = locationRepository.save(locationEntity);
+                                            personEntity.setLocationEntity(locationEntity);
+                                        }
+                                    }
+                                } else {
+                                    personEntity.setLocationEntity(null);
+                                }
+
+                                personEntity = personRepository.save(personEntity);
                             }
                             existingDragon.setKiller(personEntity);
                         }
@@ -290,9 +373,14 @@ public class DragonService {
                                     modelMapper.map(dragon.getHead(), DragonHeadEntity.class)
                             );
                         } else {
-                            dragonHeadEntity = dragonHeadRepository.getReferenceById(
+                            dragonHeadEntity = dragonHeadRepository.findById(
                                     dragon.getHead().getId().longValue()
-                            );
+                            ).orElseGet(() -> {
+                                DragonHeadEntity newEntity = modelMapper.map(dragon.getHead(), DragonHeadEntity.class);
+                                return dragonHeadRepository.save(newEntity);
+                            });
+                            dragonHeadEntity.setToothCount(dragon.getHead().getToothCount());
+                            dragonHeadEntity = dragonHeadRepository.save(dragonHeadEntity);
                         }
                         existingDragon.setHead(dragonHeadEntity);
                     } else {

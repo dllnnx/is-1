@@ -1,12 +1,20 @@
 package se.ifmo.gen.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonTypeName;
-import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.annotation.Generated;
-import jakarta.validation.constraints.NotNull;
-
+import java.net.URI;
 import java.util.Objects;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonTypeName;
+import org.springframework.lang.Nullable;
+import org.openapitools.jackson.nullable.JsonNullable;
+import java.time.OffsetDateTime;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
+import io.swagger.v3.oas.annotations.media.Schema;
+
+
+import java.util.*;
+import jakarta.annotation.Generated;
 
 /**
  * ReassignAndDeleteDragonRequest
@@ -38,7 +46,7 @@ public class ReassignAndDeleteDragonRequest {
    * ID of the dragon to which all dependencies (killer, cave, coordinates, head) will be reassigned.
    * @return newOwnerId
    */
-  @NotNull
+  @NotNull 
   @Schema(name = "newOwnerId", description = "ID of the dragon to which all dependencies (killer, cave, coordinates, head) will be reassigned.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("newOwnerId")
   public Integer getNewOwnerId() {
@@ -86,3 +94,4 @@ public class ReassignAndDeleteDragonRequest {
     return o.toString().replace("\n", "\n    ");
   }
 }
+

@@ -5,29 +5,43 @@
  */
 package se.ifmo.gen.api;
 
+import se.ifmo.gen.model.Coordinates;
+import se.ifmo.gen.model.Dragon;
+import se.ifmo.gen.model.DragonCave;
+import se.ifmo.gen.model.DragonCreate;
+import se.ifmo.gen.model.DragonHead;
+import se.ifmo.gen.model.GetDragons200Response;
+import se.ifmo.gen.model.GetDragonsRequest;
+import se.ifmo.gen.model.Location;
+import se.ifmo.gen.model.Person;
+import se.ifmo.gen.model.ReassignAndDeleteDragonRequest;
+import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Generated;
-import jakarta.validation.Valid;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.lang.Nullable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.NativeWebRequest;
-import se.ifmo.gen.model.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import jakarta.annotation.Generated;
 
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", comments = "Generator version: 7.15.0")
 @Validated
@@ -58,7 +72,7 @@ public interface DragonsApi {
         value = DragonsApi.PATH_CREATE_DRAGON,
         consumes = { "application/json" }
     )
-
+    
     default ResponseEntity<Void> createDragon(
         @Parameter(name = "DragonCreate", description = "Dragon to create", required = true) @Valid @RequestBody DragonCreate dragonCreate
     ) {
@@ -86,7 +100,7 @@ public interface DragonsApi {
         method = RequestMethod.DELETE,
         value = DragonsApi.PATH_DELETE_DRAGON_BY_AGE
     )
-
+    
     default ResponseEntity<Void> deleteDragonByAge(
         @Parameter(name = "age", description = "Dragon age", required = true, in = ParameterIn.PATH) @PathVariable("age") Integer age
     ) {
@@ -114,7 +128,7 @@ public interface DragonsApi {
         method = RequestMethod.DELETE,
         value = DragonsApi.PATH_DELETE_DRAGON_BY_ID
     )
-
+    
     default ResponseEntity<Void> deleteDragonById(
         @Parameter(name = "id", description = "Dragon ID", required = true, in = ParameterIn.PATH) @PathVariable("id") Integer id
     ) {
@@ -141,9 +155,9 @@ public interface DragonsApi {
         method = RequestMethod.DELETE,
         value = DragonsApi.PATH_DELETE_DRAGONS_IN_CAVE_WITH_MAX_DEPTH
     )
-
+    
     default ResponseEntity<Void> deleteDragonsInCaveWithMaxDepth(
-
+        
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
@@ -171,9 +185,9 @@ public interface DragonsApi {
         value = DragonsApi.PATH_GET_CAVES,
         produces = { "application/json" }
     )
-
+    
     default ResponseEntity<List<DragonCave>> getCaves(
-
+        
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
@@ -210,9 +224,9 @@ public interface DragonsApi {
         value = DragonsApi.PATH_GET_COORDINATES,
         produces = { "application/json" }
     )
-
+    
     default ResponseEntity<List<Coordinates>> getCoordinates(
-
+        
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
@@ -250,7 +264,7 @@ public interface DragonsApi {
         value = DragonsApi.PATH_GET_DRAGON_BY_ID,
         produces = { "application/json" }
     )
-
+    
     default ResponseEntity<Dragon> getDragonById(
         @Parameter(name = "id", description = "Dragon ID", required = true, in = ParameterIn.PATH) @PathVariable("id") Integer id
     ) {
@@ -291,7 +305,7 @@ public interface DragonsApi {
         produces = { "application/json" },
         consumes = { "application/json" }
     )
-
+    
     default ResponseEntity<GetDragons200Response> getDragons(
         @Parameter(name = "GetDragonsRequest", description = "Filters", required = true) @Valid @RequestBody GetDragonsRequest getDragonsRequest
     ) {
@@ -330,9 +344,9 @@ public interface DragonsApi {
         value = DragonsApi.PATH_GET_DRAGONS_AGE_SUM,
         produces = { "application/json" }
     )
-
+    
     default ResponseEntity<Integer> getDragonsAgeSum(
-
+        
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
@@ -360,9 +374,9 @@ public interface DragonsApi {
         value = DragonsApi.PATH_GET_HEADS,
         produces = { "application/json" }
     )
-
+    
     default ResponseEntity<List<DragonHead>> getHeads(
-
+        
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
@@ -399,9 +413,9 @@ public interface DragonsApi {
         value = DragonsApi.PATH_GET_LOCATIONS,
         produces = { "application/json" }
     )
-
+    
     default ResponseEntity<List<Location>> getLocations(
-
+        
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
@@ -438,9 +452,9 @@ public interface DragonsApi {
         value = DragonsApi.PATH_GET_MAX_TYPE_DRAGON,
         produces = { "application/json" }
     )
-
+    
     default ResponseEntity<Dragon> getMaxTypeDragon(
-
+        
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
@@ -477,9 +491,9 @@ public interface DragonsApi {
         value = DragonsApi.PATH_GET_PERSONS,
         produces = { "application/json" }
     )
-
+    
     default ResponseEntity<List<Person>> getPersons(
-
+        
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
@@ -515,7 +529,7 @@ public interface DragonsApi {
         method = RequestMethod.POST,
         value = DragonsApi.PATH_KILL_DRAGON
     )
-
+    
     default ResponseEntity<Void> killDragon(
         @Parameter(name = "person-id", description = "Killer person ID", required = true, in = ParameterIn.PATH) @PathVariable("person-id") Integer personId,
         @Parameter(name = "dragon-id", description = "Dragon ID", required = true, in = ParameterIn.PATH) @PathVariable("dragon-id") Integer dragonId
@@ -550,7 +564,7 @@ public interface DragonsApi {
         value = DragonsApi.PATH_REASSIGN_AND_DELETE_DRAGON,
         consumes = { "application/json" }
     )
-
+    
     default ResponseEntity<Void> reassignAndDeleteDragon(
         @Parameter(name = "id", description = "ID of the dragon to delete", required = true, in = ParameterIn.PATH) @PathVariable("id") Integer id,
         @Parameter(name = "ReassignAndDeleteDragonRequest", description = "IDs of dragons to reassign dependencies to.", required = true) @Valid @RequestBody ReassignAndDeleteDragonRequest reassignAndDeleteDragonRequest
@@ -580,7 +594,7 @@ public interface DragonsApi {
         value = DragonsApi.PATH_UPDATE_DRAGON,
         consumes = { "application/json" }
     )
-
+    
     default ResponseEntity<Void> updateDragon(
         @Parameter(name = "Dragon", description = "Dragon to update", required = true) @Valid @RequestBody Dragon dragon
     ) {

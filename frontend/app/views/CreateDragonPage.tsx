@@ -1,4 +1,5 @@
 import React, {useState} from "react";
+import {useNavigate} from "react-router-dom";
 import {
     useCreateDragonMutation,
     useGetCavesQuery,
@@ -34,6 +35,7 @@ import {
 import toast from "react-hot-toast";
 
 export const CreateDragonPage = () => {
+    const navigate = useNavigate();
     const [createDragon, {isLoading}] = useCreateDragonMutation();
     const {data: coordinates = []} = useGetCoordinatesQuery();
     const {data: caves = []} = useGetCavesQuery();
@@ -86,6 +88,7 @@ export const CreateDragonPage = () => {
             .unwrap()
             .then(v => {
                 toast.success("Dragon created successfully!");
+                navigate("/");
             })
             .catch(e => {
                 const errorMessage = e?.data?.message || e?.message || "Failed to create dragon";
