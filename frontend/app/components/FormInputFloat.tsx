@@ -22,6 +22,84 @@ export const FormInputFloat = ({
     const min = validation?.min ?? -Number.MAX_VALUE;
     const max = validation?.max ?? Number.MAX_VALUE;
     const required = validation?.required ?? false;
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        const input = e.currentTarget;
+        const currentValue = input.value;
+        const cursorStart = input.selectionStart || 0;
+        const cursorEnd = input.selectionEnd || 0;
+        const dotIndex = currentValue.indexOf('.');
+        
+        if (e.key === '.' || e.key === ',') {
+            if (dotIndex !== -1) {
+                e.preventDefault();
+                return;
+            }
+        }
+        
+        if (e.key.length === 1 && /[0-9]/.test(e.key)) {
+            if (dotIndex !== -1 && cursorStart > dotIndex) {
+                const textBeforeCursor = currentValue.substring(0, cursorStart);
+                const textAfterCursor = currentValue.substring(cursorEnd);
+                const newValue = textBeforeCursor + e.key + textAfterCursor;
+                const newDotIndex = newValue.indexOf('.');
+                
+                if (newDotIndex !== -1) {
+                    const decimalPart = newValue.substring(newDotIndex + 1);
+                    if (decimalPart.length > 4) {
+                        e.preventDefault();
+                        return;
+                    }
+                }
+            }
+        }
+    };
+
+    const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+        e.preventDefault();
+        const pastedText = e.clipboardData.getData('text');
+        const cleaned = pastedText.replace(/[^0-9.-]/g, '');
+        const parts = cleaned.split('.');
+        let validValue = parts[0] || '';
+        if (parts.length > 1) {
+            validValue += '.' + parts[1].substring(0, 4);
+        }
+        const floatValue = parseFloat(validValue);
+        if (!isNaN(floatValue)) {
+            onChange(floatValue);
+        }
+    };
+
+    const handleInput = (e: React.FormEvent<HTMLInputElement>) => {
+        const input = e.currentTarget;
+        let inputValue = input.value;
+
+        if (inputValue === '') {
+            onChange(0);
+            return;
+        }
+
+        const parts = inputValue.split('.');
+        if (parts.length === 2 && parts[1].length > 4) {
+            const truncated = parts[0] + '.' + parts[1].substring(0, 4);
+            const floatValue = parseFloat(truncated);
+            if (!isNaN(floatValue)) {
+                onChange(floatValue);
+                setTimeout(() => {
+                    const dotIndex = truncated.indexOf('.');
+                    if (dotIndex !== -1) {
+                        input.setSelectionRange(truncated.length, truncated.length);
+                    }
+                }, 0);
+            }
+            return;
+        }
+
+        const floatValue = parseFloat(inputValue);
+        if (!isNaN(floatValue)) {
+            onChange(floatValue);
+        }
+    };
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const inputValue = e.target.value;
 
@@ -30,8 +108,17 @@ export const FormInputFloat = ({
             return;
         }
 
-        const floatValue = parseFloat(inputValue);
+        const parts = inputValue.split('.');
+        if (parts.length === 2 && parts[1].length > 4) {
+            const truncated = parts[0] + '.' + parts[1].substring(0, 4);
+            const floatValue = parseFloat(truncated);
+            if (!isNaN(floatValue)) {
+                onChange(floatValue);
+            }
+            return;
+        }
 
+        const floatValue = parseFloat(inputValue);
         if (!isNaN(floatValue)) {
             onChange(floatValue);
         }
@@ -57,6 +144,9 @@ export const FormInputFloat = ({
                     !isValid ? 'border-red-500' : 'border-gray-300'
                 } focus:outline-none focus:ring-2 focus:ring-blue-500`}
                 value={value}
+                onKeyDown={handleKeyDown}
+                onPaste={handlePaste}
+                onInput={handleInput}
                 onChange={handleChange}
             />
             <div className="mt-1">

@@ -150,6 +150,83 @@ export const TablePage = () => {
         });
     };
 
+    const handleDecimalInput = (e: React.FormEvent<HTMLInputElement>, callback: (value: number | undefined) => void) => {
+        const input = e.currentTarget;
+        let inputValue = input.value;
+
+        if (inputValue === '') {
+            callback(undefined);
+            return;
+        }
+
+        const parts = inputValue.split('.');
+        if (parts.length === 2 && parts[1].length > 4) {
+            const truncated = parts[0] + '.' + parts[1].substring(0, 4);
+            const floatValue = parseFloat(truncated);
+            if (!isNaN(floatValue)) {
+                callback(floatValue);
+                setTimeout(() => {
+                    input.setSelectionRange(truncated.length, truncated.length);
+                }, 0);
+            }
+            return;
+        }
+
+        const floatValue = parseFloat(inputValue);
+        if (!isNaN(floatValue)) {
+            callback(floatValue);
+        }
+    };
+
+    const handleDecimalKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        const input = e.currentTarget;
+        const currentValue = input.value;
+        const cursorStart = input.selectionStart || 0;
+        const cursorEnd = input.selectionEnd || 0;
+        const dotIndex = currentValue.indexOf('.');
+        
+        if (e.key === '.' || e.key === ',') {
+            if (dotIndex !== -1) {
+                e.preventDefault();
+                return;
+            }
+        }
+        
+        if (e.key.length === 1 && /[0-9]/.test(e.key)) {
+            if (dotIndex !== -1 && cursorStart > dotIndex) {
+                const textBeforeCursor = currentValue.substring(0, cursorStart);
+                const textAfterCursor = currentValue.substring(cursorEnd);
+                const newValue = textBeforeCursor + e.key + textAfterCursor;
+                const newDotIndex = newValue.indexOf('.');
+                
+                if (newDotIndex !== -1) {
+                    const decimalPart = newValue.substring(newDotIndex + 1);
+                    if (decimalPart.length > 4) {
+                        e.preventDefault();
+                        return;
+                    }
+                }
+            }
+        }
+    };
+
+    const handleDecimalPaste = (e: React.ClipboardEvent<HTMLInputElement>, callback: (value: number | undefined) => void) => {
+        e.preventDefault();
+        const pastedText = e.clipboardData.getData('text');
+        const cleaned = pastedText.replace(/[^0-9.-]/g, '');
+        const parts = cleaned.split('.');
+        let validValue = parts[0] || '';
+        if (parts.length > 1) {
+            validValue += '.' + parts[1].substring(0, 4);
+        }
+        const floatValue = parseFloat(validValue);
+        if (!isNaN(floatValue)) {
+            callback(floatValue);
+        } else if (validValue === '') {
+            callback(undefined);
+        }
+    };
+
     const clearAllFilters = () => {
         setFilterDragon({});
         setCurrentPage(0);
@@ -341,24 +418,82 @@ export const TablePage = () => {
                         <td className="border border-gray-300 px-2 py-2">
                             <input
                                 type="number"
+                                step="0.0001"
                                 placeholder="X"
                                 value={filterDragon.coordinates?.x ?? ""}
-                                onChange={(e) => updateFilter('coordinates', {
+                                onKeyDown={handleDecimalKeyDown}
+                                onPaste={(e) => handleDecimalPaste(e, (val) => updateFilter('coordinates', {
                                     ...filterDragon.coordinates,
-                                    x: e.target.value ? Number(e.target.value) : undefined
-                                } as CoordinatesFilter)}
+                                    x: val
+                                } as CoordinatesFilter))}
+                                onInput={(e) => handleDecimalInput(e, (val) => updateFilter('coordinates', {
+                                    ...filterDragon.coordinates,
+                                    x: val
+                                } as CoordinatesFilter))}
+                                onChange={(e) => {
+                                    const inputValue = e.target.value;
+                                    if (inputValue === '') {
+                                        updateFilter('coordinates', {
+                                            ...filterDragon.coordinates,
+                                            x: undefined
+                                        } as CoordinatesFilter);
+                                        return;
+                                    }
+                                    const parts = inputValue.split('.');
+                                    if (parts.length === 2 && parts[1].length > 4) {
+                                        const truncated = parts[0] + '.' + parts[1].substring(0, 4);
+                                        updateFilter('coordinates', {
+                                            ...filterDragon.coordinates,
+                                            x: parseFloat(truncated)
+                                        } as CoordinatesFilter);
+                                        return;
+                                    }
+                                    updateFilter('coordinates', {
+                                        ...filterDragon.coordinates,
+                                        x: inputValue ? Number(inputValue) : undefined
+                                    } as CoordinatesFilter);
+                                }}
                                 className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
                             />
                         </td>
                         <td className="border border-gray-300 px-2 py-2">
                             <input
                                 type="number"
+                                step="0.0001"
                                 placeholder="Y"
                                 value={filterDragon.coordinates?.y ?? ""}
-                                onChange={(e) => updateFilter('coordinates', {
+                                onKeyDown={handleDecimalKeyDown}
+                                onPaste={(e) => handleDecimalPaste(e, (val) => updateFilter('coordinates', {
                                     ...filterDragon.coordinates,
-                                    y: e.target.value ? Number(e.target.value) : undefined
-                                } as CoordinatesFilter)}
+                                    y: val
+                                } as CoordinatesFilter))}
+                                onInput={(e) => handleDecimalInput(e, (val) => updateFilter('coordinates', {
+                                    ...filterDragon.coordinates,
+                                    y: val
+                                } as CoordinatesFilter))}
+                                onChange={(e) => {
+                                    const inputValue = e.target.value;
+                                    if (inputValue === '') {
+                                        updateFilter('coordinates', {
+                                            ...filterDragon.coordinates,
+                                            y: undefined
+                                        } as CoordinatesFilter);
+                                        return;
+                                    }
+                                    const parts = inputValue.split('.');
+                                    if (parts.length === 2 && parts[1].length > 4) {
+                                        const truncated = parts[0] + '.' + parts[1].substring(0, 4);
+                                        updateFilter('coordinates', {
+                                            ...filterDragon.coordinates,
+                                            y: parseFloat(truncated)
+                                        } as CoordinatesFilter);
+                                        return;
+                                    }
+                                    updateFilter('coordinates', {
+                                        ...filterDragon.coordinates,
+                                        y: inputValue ? Number(inputValue) : undefined
+                                    } as CoordinatesFilter);
+                                }}
                                 className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
                             />
                         </td>
@@ -403,12 +538,41 @@ export const TablePage = () => {
                         <td className="border border-gray-300 px-2 py-2">
                             <input
                                 type="number"
+                                step="0.0001"
                                 placeholder="Depth"
                                 value={filterDragon.cave?.depth ?? ""}
-                                onChange={(e) => updateFilter('cave', {
+                                onKeyDown={handleDecimalKeyDown}
+                                onPaste={(e) => handleDecimalPaste(e, (val) => updateFilter('cave', {
                                     ...filterDragon.cave,
-                                    depth: e.target.value ? Number(e.target.value) : undefined
-                                } as DragonCaveFilter)}
+                                    depth: val
+                                } as DragonCaveFilter))}
+                                onInput={(e) => handleDecimalInput(e, (val) => updateFilter('cave', {
+                                    ...filterDragon.cave,
+                                    depth: val
+                                } as DragonCaveFilter))}
+                                onChange={(e) => {
+                                    const inputValue = e.target.value;
+                                    if (inputValue === '') {
+                                        updateFilter('cave', {
+                                            ...filterDragon.cave,
+                                            depth: undefined
+                                        } as DragonCaveFilter);
+                                        return;
+                                    }
+                                    const parts = inputValue.split('.');
+                                    if (parts.length === 2 && parts[1].length > 4) {
+                                        const truncated = parts[0] + '.' + parts[1].substring(0, 4);
+                                        updateFilter('cave', {
+                                            ...filterDragon.cave,
+                                            depth: parseFloat(truncated)
+                                        } as DragonCaveFilter);
+                                        return;
+                                    }
+                                    updateFilter('cave', {
+                                        ...filterDragon.cave,
+                                        depth: inputValue ? Number(inputValue) : undefined
+                                    } as DragonCaveFilter);
+                                }}
                                 className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
                             />
                         </td>
@@ -488,12 +652,41 @@ export const TablePage = () => {
                         <td className="border border-gray-300 px-2 py-2">
                             <input
                                 type="number"
+                                step="0.0001"
                                 placeholder="Teeth"
                                 value={filterDragon.head?.toothCount ?? ""}
-                                onChange={(e) => updateFilter('head', {
+                                onKeyDown={handleDecimalKeyDown}
+                                onPaste={(e) => handleDecimalPaste(e, (val) => updateFilter('head', {
                                     ...filterDragon.head,
-                                    toothCount: e.target.value ? Number(e.target.value) : undefined
-                                } as DragonHeadFilter)}
+                                    toothCount: val
+                                } as DragonHeadFilter))}
+                                onInput={(e) => handleDecimalInput(e, (val) => updateFilter('head', {
+                                    ...filterDragon.head,
+                                    toothCount: val
+                                } as DragonHeadFilter))}
+                                onChange={(e) => {
+                                    const inputValue = e.target.value;
+                                    if (inputValue === '') {
+                                        updateFilter('head', {
+                                            ...filterDragon.head,
+                                            toothCount: undefined
+                                        } as DragonHeadFilter);
+                                        return;
+                                    }
+                                    const parts = inputValue.split('.');
+                                    if (parts.length === 2 && parts[1].length > 4) {
+                                        const truncated = parts[0] + '.' + parts[1].substring(0, 4);
+                                        updateFilter('head', {
+                                            ...filterDragon.head,
+                                            toothCount: parseFloat(truncated)
+                                        } as DragonHeadFilter);
+                                        return;
+                                    }
+                                    updateFilter('head', {
+                                        ...filterDragon.head,
+                                        toothCount: inputValue ? Number(inputValue) : undefined
+                                    } as DragonHeadFilter);
+                                }}
                                 className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
                             />
                         </td>
