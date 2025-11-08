@@ -2,8 +2,8 @@ FROM maven:3.9.11-amazoncorretto-21-alpine
 WORKDIR /app
 
 COPY pom.xml .
-COPY dragons-service/pom.xml dragons-service
-COPY openapi-gen/pom.xml openapi-gen
+COPY dragons-service/pom.xml dragons-service/
+COPY openapi-gen/pom.xml openapi-gen/
 RUN mvn dependency:go-offline -B
 
 COPY . .

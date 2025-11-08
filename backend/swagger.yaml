@@ -1,1 +1,829 @@
-../swagger.yaml
+openapi: 3.0.3
+info:
+  title: Dragon Managing API
+  description: API для управления драконами
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+    description: localhost
+  - url: https://se.ifmo.ru/~s408524/
+    description: Helios
+tags:
+  - name: Dragons
+    description: Управление драконами
+components:
+  schemas:
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: integer
+          format: int32
+          minimum: 0
+          default: 0
+          description: Номер страницы
+        size:
+          type: integer
+          format: int32
+          minimum: 0
+          default: 20
+          description: Размер страницы
+    SortingColumn:
+      type: string
+      enum:
+        - ID
+        - NAME
+        - COORDINATES_X
+        - COORDINATES_Y
+        - CREATION_DATE
+        - CAVE_DEPTH
+        - CAVE_NUMBER_OF_TREASURES
+        - PERSON_NAME
+        - PERSON_EYE_COLOR
+        - PERSON_HAIR_COLOR
+        - PERSON_LOCATION_X
+        - PERSON_LOCATION_Y
+        - PERSON_LOCATION_NAME
+        - PERSON_HEIGHT
+        - PERSON_WEIGHT
+        - PERSON_PASSPORT_ID
+        - AGE
+        - COLOR
+        - DRAGON_TYPE
+        - CHARACTER
+        - HEAD_TOOTH_COUNT
+    SortingDirection:
+      type: string
+      enum:
+        - ASC
+        - DESC
+    Sorting:
+      type: object
+      required: [ column, direction ]
+      properties:
+        column:
+          $ref: '#/components/schemas/SortingColumn'
+        direction:
+          $ref: '#/components/schemas/SortingDirection'
+    SortingList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Sorting'
+    Color:
+      type: string
+      enum:
+        - GREEN
+        - RED
+        - WHITE
+        - BROWN
+    DragonType:
+      type: string
+      enum:
+        - WATER
+        - UNDERGROUND
+        - AIR
+        - FIRE
+    DragonCharacter:
+      type: string
+      enum:
+        - CUNNING
+        - WISE
+        - GOOD
+        - CHAOTIC_EVIL
+        - FICKLE
+    Coordinates:
+      type: object
+      required: [ x, y ]
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: >
+            Auto-generated unique ID.  
+            Must not be null and must be greater than 0.
+          minimum: 1
+        x:
+          type: number
+          format: float
+          maximum: 187
+        y:
+          type: number
+          format: double
+    DragonCreateCoordinates:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: >
+            Auto-generated unique ID.  
+            Must not be null and must be greater than 0.
+          minimum: 1
+        x:
+          type: number
+          format: float
+          maximum: 187
+        y:
+          type: number
+          format: double
+    CoordinatesFilter:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: >
+            Auto-generated unique ID.  
+            Must not be null and must be greater than 0.
+        x:
+          type: number
+          format: float
+        y:
+          type: number
+          format: double
+    DragonCave:
+      type: object
+      required: [ depth, numberOfTreasures ]
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: >
+            Auto-generated unique ID.  
+            Must not be null and must be greater than 0.
+          minimum: 1
+        depth:
+          type: number
+          format: float
+        numberOfTreasures:
+          type: integer
+          format: int64
+          minimum: 1
+    DragonCreateCave:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: >
+            Auto-generated unique ID.  
+            Must not be null and must be greater than 0.
+          minimum: 1
+        depth:
+          type: number
+          format: float
+        numberOfTreasures:
+          type: integer
+          format: int64
+          minimum: 1
+    DragonCaveFilter:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: >
+            Auto-generated unique ID.  
+            Must not be null and must be greater than 0.
+        depth:
+          type: number
+          format: float
+        numberOfTreasures:
+          type: integer
+          format: int64
+    DragonHead:
+      type: object
+      required: [ toothCount ]
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: >
+            Auto-generated unique ID.  
+            Must not be null and must be greater than 0.
+          minimum: 1
+        toothCount:
+          type: number
+          format: float
+    DragonCreateHead:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: >
+            Auto-generated unique ID.  
+            Must not be null and must be greater than 0.
+          minimum: 1
+        toothCount:
+          type: number
+          format: float
+    DragonHeadFilter:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: >
+            Auto-generated unique ID.  
+            Must not be null and must be greater than 0.
+        toothCount:
+          type: number
+          format: float
+    Location:
+      type: object
+      required: [ x, y ]
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: >
+            Auto-generated unique ID.  
+            Must not be null and must be greater than 0.
+          minimum: 1
+        x:
+          type: number
+          format: double
+        y:
+          type: integer
+          format: int32
+        name:
+          type: string
+          nullable: true
+          maxLength: 416
+    LocationFilter:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: >
+            Auto-generated unique ID.  
+            Must not be null and must be greater than 0.
+        x:
+          type: number
+          format: double
+        y:
+          type: integer
+          format: int32
+        name:
+          type: string
+          nullable: true
+          maxLength: 416
+    Person:
+      type: object
+      required: [ name, eyeColor, weight, passportID ]
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: >
+            Auto-generated unique ID.  
+            Must not be null and must be greater than 0.
+          minimum: 1
+        name:
+          type: string
+          minLength: 1
+        eyeColor:
+          $ref: '#/components/schemas/Color'
+        hairColor:
+          allOf:
+            - $ref: '#/components/schemas/Color'
+          nullable: true
+        location:
+          allOf:
+            - $ref: '#/components/schemas/Location'
+          nullable: true
+        height:
+          type: number
+          format: double
+          nullable: true
+          minimum: 0.000001
+          description: >
+            Must be greater than 0 if present.
+        weight:
+          type: number
+          format: double
+          minimum: 0.000001
+        passportID:
+          type: string
+          description: >
+            Unique passport identifier. Must not be null.
+    DragonCreatePerson:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: >
+            Auto-generated unique ID.  
+            Must not be null and must be greater than 0.
+          minimum: 1
+        name:
+          type: string
+          minLength: 1
+        eyeColor:
+          $ref: '#/components/schemas/Color'
+        hairColor:
+          allOf:
+            - $ref: '#/components/schemas/Color'
+          nullable: true
+        location:
+          allOf:
+            - $ref: '#/components/schemas/Location'
+          nullable: true
+        height:
+          type: number
+          format: double
+          nullable: true
+          minimum: 0.000001
+          description: >
+            Must be greater than 0 if present.
+        weight:
+          type: number
+          format: double
+          minimum: 0.000001
+        passportID:
+          type: string
+          description: >
+            Unique passport identifier. Must not be null.
+    PersonFilter:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: >
+            Auto-generated unique ID.  
+            Must not be null and must be greater than 0.
+        name:
+          type: string
+          minLength: 1
+        eyeColor:
+          $ref: '#/components/schemas/Color'
+        hairColor:
+          allOf:
+            - $ref: '#/components/schemas/Color'
+          nullable: true
+        location:
+          allOf:
+            - $ref: '#/components/schemas/LocationFilter'
+          nullable: true
+        height:
+          type: number
+          format: double
+          nullable: true
+          description: >
+            Must be greater than 0 if present.
+        weight:
+          type: number
+          format: double
+        passportID:
+          type: string
+          description: >
+            Unique passport identifier. Must not be null.
+    Dragon:
+      type: object
+      required:
+        - id
+        - name
+        - coordinates
+        - creationDate
+        - cave
+        - age
+        - color
+        - type
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: >
+            Auto-generated unique ID.  
+            Must not be null and must be greater than 0.
+          minimum: 1
+        name:
+          type: string
+          description: Must not be null or empty.
+          minLength: 1
+        coordinates:
+          $ref: '#/components/schemas/Coordinates'
+        creationDate:
+          type: string
+          format: date-time
+          description: >
+            Auto-generated creation date.  
+            Must not be null.
+        cave:
+          $ref: '#/components/schemas/DragonCave'
+        killer:
+          allOf:
+            - $ref: '#/components/schemas/Person'
+          nullable: true
+        age:
+          type: integer
+          format: int32
+          minimum: 1
+          description: Must not be null and greater than 0.
+        color:
+          $ref: '#/components/schemas/Color'
+        type:
+          $ref: '#/components/schemas/DragonType'
+        character:
+          allOf:
+            - $ref: '#/components/schemas/DragonCharacter'
+          nullable: true
+        head:
+          $ref: '#/components/schemas/DragonHead'
+    DragonFilter:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: >
+            Auto-generated unique ID.  
+            Must not be null and must be greater than 0.
+        name:
+          type: string
+          description: Must not be null or empty.
+          minLength: 1
+        coordinates:
+          $ref: '#/components/schemas/CoordinatesFilter'
+        creationDateRange:
+          $ref: '#/components/schemas/DateRangeFilter'
+        cave:
+          $ref: '#/components/schemas/DragonCaveFilter'
+        killer:
+          allOf:
+            - $ref: '#/components/schemas/PersonFilter'
+          nullable: true
+        age:
+          type: integer
+          format: int32
+          description: Must not be null and greater than 0.
+        color:
+          $ref: '#/components/schemas/Color'
+        type:
+          $ref: '#/components/schemas/DragonType'
+        character:
+          allOf:
+            - $ref: '#/components/schemas/DragonCharacter'
+          nullable: true
+        head:
+          $ref: '#/components/schemas/DragonHeadFilter'
+    DragonCreate:
+      type: object
+      required:
+        - name
+        - age
+        - color
+        - type
+      properties:
+        name:
+          type: string
+          description: Must not be null or empty.
+          minLength: 1
+        coordinates:
+          anyOf:
+            - $ref: '#/components/schemas/DragonCreateCoordinates'
+            - type: integer
+              format: int32
+          description: Either a DragonCreateCoordinates object or an ID reference to existing coordinates
+        cave:
+          anyOf:
+            - $ref: '#/components/schemas/DragonCreateCave'
+            - type: integer
+              format: int32
+          description: Either a DragonCreateCave object or an ID reference to existing cave
+        killer:
+          anyOf:
+            - $ref: '#/components/schemas/DragonCreatePerson'
+            - type: integer
+              format: int32
+          description: Either a DragonCreatePerson object or an ID reference to existing person
+          nullable: true
+        age:
+          type: integer
+          format: int32
+          minimum: 1
+          description: Must not be null and greater than 0.
+        color:
+          $ref: '#/components/schemas/Color'
+        type:
+          $ref: '#/components/schemas/DragonType'
+        character:
+          allOf:
+            - $ref: '#/components/schemas/DragonCharacter'
+          nullable: true
+        head:
+          anyOf:
+            - $ref: '#/components/schemas/DragonCreateHead'
+            - type: integer
+              format: int32
+          description: Either a DragonCreateHead object or an ID reference to existing head
+          nullable: true
+    DateRangeFilter:
+      type: object
+      description: "Object to filter for date."
+      properties:
+        from:
+          type: string
+          format: date-time
+          description: "Start date and time."
+        to:
+          type: string
+          format: date-time
+          description: "End date and time."
+paths:
+  /dragons:
+    post:
+      summary: Create a dragon
+      operationId: createDragon
+      tags:
+        - Dragons
+      requestBody:
+        description: Dragon to create
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DragonCreate'
+      responses:
+        201:
+          description: Created
+    put:
+      summary: Update a dragon
+      operationId: updateDragon
+      tags:
+        - Dragons
+      requestBody:
+        description: Dragon to update
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Dragon'
+      responses:
+        200:
+          description: OK
+  /dragons/{id}:
+    get:
+      summary: Get a dragon by ID
+      operationId: getDragonById
+      tags:
+        - Dragons
+      parameters:
+        - name: id
+          in: path
+          description: Dragon ID
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dragon'
+    delete:
+      summary: Delete a dragon by ID
+      operationId: deleteDragonById
+      tags:
+        - Dragons
+      parameters:
+        - name: id
+          in: path
+          description: Dragon ID
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        204:
+          description: No content
+  /dragons/filter:
+    post:
+      summary: Get all dragons
+      operationId: getDragons
+      tags:
+        - Dragons
+      requestBody:
+        description: Filters
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                pagination:
+                  $ref: '#/components/schemas/Pagination'
+                sorting:
+                  $ref: '#/components/schemas/SortingList'
+                dragon:
+                  $ref: '#/components/schemas/DragonFilter'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  dragons:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Dragon'
+                  total_page_count:
+                    type: integer
+                  total_dragons_count:
+                    type: integer
+
+  /dragons/ages/{age}:
+    delete:
+      summary: Delete a dragon by age
+      operationId: deleteDragonByAge
+      tags:
+        - Dragons
+      parameters:
+        - name: age
+          in: path
+          description: Dragon age
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        204:
+          description: No content
+
+  /dragons/ages/sum:
+    get:
+      summary: Get sum of all dragons ages
+      operationId: getDragonsAgeSum
+      tags:
+        - Dragons
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: integer
+                format: int32
+  /dragons/types/max:
+    get:
+      summary: Get dragon with max type
+      operationId: getMaxTypeDragon
+      tags:
+        - Dragons
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dragon'
+  /dragons/caves/delete-by-max-depth:
+    delete:
+      summary: Delete all dragons in cave with max depth
+      operationId: deleteDragonsInCaveWithMaxDepth
+      tags:
+        - Dragons
+      responses:
+        204:
+          description: No content
+  /dragons/persons/{person-id}/kill/{dragon-id}:
+    post:
+      summary: Kill dragon
+      operationId: killDragon
+      tags:
+        - Dragons
+      parameters:
+        - name: person-id
+          in: path
+          description: Killer person ID
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: dragon-id
+          in: path
+          description: Dragon ID
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        200:
+          description: OK
+  /dragons/coordinates:
+    get:
+      summary: Get all coordinates
+      operationId: getCoordinates
+      tags:
+        - Dragons
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Coordinates'
+  /dragons/caves:
+    get:
+      summary: Get all caves
+      operationId: getCaves
+      tags:
+        - Dragons
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DragonCave'
+  /dragons/persons:
+    get:
+      summary: Get all persons
+      operationId: getPersons
+      tags:
+        - Dragons
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Person'
+  /dragons/heads:
+    get:
+      summary: Get all heads
+      operationId: getHeads
+      tags:
+        - Dragons
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DragonHead'
+  /dragons/locations:
+    get:
+      summary: Get all locations
+      operationId: getLocations
+      tags:
+        - Dragons
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Location'
+  /dragons/{id}/reassign-and-delete:
+    post:
+      summary: Reassign dependencies and delete a dragon
+      operationId: reassignAndDeleteDragon
+      tags:
+        - Dragons
+      parameters:
+        - name: id
+          in: path
+          description: ID of the dragon to delete
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        description: IDs of dragons to reassign dependencies to.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [ newOwnerId ]
+              properties:
+                newOwnerId:
+                  type: integer
+                  format: int32
+                  description: "ID of the dragon to which all dependencies (killer, cave, coordinates, head) will be reassigned."
+      responses:
+        204:
+          description: Successfully deleted
+        404:
+          description: Dragon not found
+        400:
+          description: Bad request (e.g., new owner ID is invalid)
