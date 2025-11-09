@@ -8,4 +8,4 @@ RUN mvn dependency:go-offline -B
 
 COPY . .
 RUN mvn package -DskipTests
-ENTRYPOINT java -jar ./backend/dragons-service/target/dragons_service.jar
+ENTRYPOINT java -jar ./dragons-service/target/dragons_service.jar
