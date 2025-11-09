@@ -6,7 +6,7 @@ on:
 
 jobs:
   backend-check:
-    name: Java Check
+    name: Backend Check & Test
     runs-on: ubuntu-latest
 
     defaults:
@@ -26,6 +26,9 @@ jobs:
 
       - name: 3. Run Linter & Formatter (Spotless)
         run: mvn spotless:check
+
+      - name: 4. Run Tests
+        run: mvn test
 
   frontend-check:
     name: React Check
