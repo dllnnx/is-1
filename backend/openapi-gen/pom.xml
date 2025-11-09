@@ -77,7 +77,7 @@
                             <goal>generate</goal>
                         </goals>
                         <configuration>
-                            <inputSpec>${project.basedir}/../swagger.yaml</inputSpec>
+                            <inputSpec>${project.basedir}/../swagger.yml</inputSpec>
                             <generatorName>spring</generatorName>
                             <apiPackage>se.ifmo.gen.api</apiPackage>
                             <modelPackage>se.ifmo.gen.model</modelPackage>
