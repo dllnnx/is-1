@@ -82,7 +82,7 @@ export const FormInput = ({
                 onInput={(e) => {
                     if (type === "number") {
                         const input = e.currentTarget as HTMLInputElement;
-                        let inputValue = input.value;
+                        const inputValue = input.value;
                         
                         if (inputValue === '') {
                             onChange(0);

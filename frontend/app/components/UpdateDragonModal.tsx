@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from "react";
-import type {Dragon, Color, DragonCharacter, DragonType} from "~/gen/types.generated";
+import type {Dragon, Color, DragonCharacter, DragonType, DragonCave, Coordinates} from "~/gen/types.generated";
 import {useUpdateDragonMutation, useGetCoordinatesQuery, useGetCavesQuery, useGetPersonsQuery, useGetHeadsQuery, useGetLocationsQuery} from "~/gen/types.generated";
 import {FormInputString} from "~/components/FormInputString";
 import {FormInputInt} from "~/components/FormInputInt";
@@ -115,7 +115,7 @@ export const UpdateDragonModal = ({isOpen, onClose, dragonToUpdate}: Props) => {
                 ? formData.coordinates 
                 : {x: newCoordinates.x, y: newCoordinates.y};
             return {
-                id: (formData.coordinates as any)?.id,
+                id: (formData.coordinates as Coordinates)?.id,
                 x: coords.x ?? 0,
                 y: coords.y ?? 0,
             };
@@ -129,7 +129,7 @@ export const UpdateDragonModal = ({isOpen, onClose, dragonToUpdate}: Props) => {
                 ? formData.cave
                 : {depth: newCave.depth, numberOfTreasures: newCave.numberOfTreasures};
             return {
-                id: (formData.cave as any)?.id,
+                id: (formData.cave as DragonCave)?.id,
                 depth: cave.depth ?? 0,
                 numberOfTreasures: cave.numberOfTreasures ?? 0,
             };

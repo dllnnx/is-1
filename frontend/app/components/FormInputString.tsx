@@ -18,7 +18,6 @@ export const FormInputString = ({
                                     placeholder,
                                 }: FormInputStringProps) => {
     const maxLength = validation?.maxLength ?? 255;
-    const minLength = validation?.minLength ?? 0;
     const required = validation?.required ?? false;
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

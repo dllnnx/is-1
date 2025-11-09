@@ -152,7 +152,7 @@ export const TablePage = () => {
 
     const handleDecimalInput = (e: React.FormEvent<HTMLInputElement>, callback: (value: number | undefined) => void) => {
         const input = e.currentTarget;
-        let inputValue = input.value;
+        const inputValue = input.value;
 
         if (inputValue === '') {
             callback(undefined);

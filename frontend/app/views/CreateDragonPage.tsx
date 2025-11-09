@@ -86,7 +86,7 @@ export const CreateDragonPage = () => {
 
         await createDragon({dragonCreate: payload as DragonCreate})
             .unwrap()
-            .then(v => {
+            .then(() => {
                 toast.success("Dragon created successfully!");
                 navigate("/");
             })

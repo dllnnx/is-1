@@ -7,8 +7,16 @@ import {DragonMenu} from "./containers/SideBar";
 export const ApplicationRoutes: React.FC = () => {
     return (
         <Routes>
-            <Route path="/create" element={<DragonMenu children={CreateDragonPage()}/>}/>
-            <Route path="*" element={<DragonMenu children={TablePage()}/>}/>
+            <Route path="/create" element={
+                <DragonMenu>
+                    <CreateDragonPage/>
+                </DragonMenu>
+            }/>
+            <Route path="*" element={
+                <DragonMenu>
+                    <TablePage/>
+                </DragonMenu>
+            }/>
         </Routes>
     );
 };

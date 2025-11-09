@@ -28,21 +28,21 @@ export const FormInputFloat = ({
         const cursorStart = input.selectionStart || 0;
         const cursorEnd = input.selectionEnd || 0;
         const dotIndex = currentValue.indexOf('.');
-        
+
         if (e.key === '.' || e.key === ',') {
             if (dotIndex !== -1) {
                 e.preventDefault();
                 return;
             }
         }
-        
+
         if (e.key.length === 1 && /[0-9]/.test(e.key)) {
             if (dotIndex !== -1 && cursorStart > dotIndex) {
                 const textBeforeCursor = currentValue.substring(0, cursorStart);
                 const textAfterCursor = currentValue.substring(cursorEnd);
                 const newValue = textBeforeCursor + e.key + textAfterCursor;
                 const newDotIndex = newValue.indexOf('.');
-                
+
                 if (newDotIndex !== -1) {
                     const decimalPart = newValue.substring(newDotIndex + 1);
                     if (decimalPart.length > 4) {
@@ -71,7 +71,7 @@ export const FormInputFloat = ({
 
     const handleInput = (e: React.FormEvent<HTMLInputElement>) => {
         const input = e.currentTarget;
-        let inputValue = input.value;
+        const inputValue = input.value;
 
         if (inputValue === '') {
             onChange(0);

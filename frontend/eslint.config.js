@@ -8,7 +8,10 @@ import prettierConfig from 'eslint-config-prettier';
 
 export default [
     {
-        ignores: ['dist/'],
+        ignores: [
+            'dist/',
+            'tailwind.config.js'
+        ],
     },
 
     js.configs.recommended,
@@ -34,7 +37,16 @@ export default [
         rules: {
             ...reactPlugin.configs.recommended.rules,
             ...reactHooks.configs.recommended.rules,
+            'react/react-in-jsx-scope': 'off',
             'react-refresh/only-export-components': 'warn',
+            'react-hooks/set-state-in-effect': 'off',
+        },
+    },
+
+    {
+        files: ['**/*.{ts,tsx}'],
+        rules: {
+            '@typescript-eslint/no-explicit-any': 'off',
         },
     },
 
