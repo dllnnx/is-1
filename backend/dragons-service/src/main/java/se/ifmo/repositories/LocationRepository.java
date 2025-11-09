@@ -5,5 +5,4 @@ import org.springframework.stereotype.Repository;
 import se.ifmo.models.LocationEntity;
 
 @Repository
-public interface LocationRepository extends JpaRepository<LocationEntity, Long> {
-}
+public interface LocationRepository extends JpaRepository<LocationEntity, Long> {}

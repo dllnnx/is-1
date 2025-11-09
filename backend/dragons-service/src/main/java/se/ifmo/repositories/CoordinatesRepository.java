@@ -5,5 +5,4 @@ import org.springframework.stereotype.Repository;
 import se.ifmo.models.CoordinatesEntity;
 
 @Repository
-public interface CoordinatesRepository extends JpaRepository<CoordinatesEntity, Long> {
-}
+public interface CoordinatesRepository extends JpaRepository<CoordinatesEntity, Long> {}

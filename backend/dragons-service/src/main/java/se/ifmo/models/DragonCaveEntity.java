@@ -11,12 +11,12 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class DragonCaveEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    private Float depth;
+  private Float depth;
 
-    @Column(name = "number_of_treasures", nullable = false)
-    private Long numberOfTreasures;
+  @Column(name = "number_of_treasures", nullable = false)
+  private Long numberOfTreasures;
 }

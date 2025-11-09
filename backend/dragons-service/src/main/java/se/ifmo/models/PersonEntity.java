@@ -13,32 +13,32 @@ import org.hibernate.type.SqlTypes;
 @AllArgsConstructor
 @Builder
 public class PersonEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @Column(nullable = false)
-    private String name;
+  @Column(nullable = false)
+  private String name;
 
-    @Enumerated(EnumType.STRING)
-    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
-    @Column(name = "eye_color", nullable = false, columnDefinition = "color")
-    private Color eyeColor;
+  @Enumerated(EnumType.STRING)
+  @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+  @Column(name = "eye_color", nullable = false, columnDefinition = "color")
+  private Color eyeColor;
 
-    @Enumerated(EnumType.STRING)
-    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
-    @Column(name = "hair_color", columnDefinition = "color")
-    private Color hairColor;
+  @Enumerated(EnumType.STRING)
+  @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+  @Column(name = "hair_color", columnDefinition = "color")
+  private Color hairColor;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "location_id")
-    private LocationEntity locationEntity;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "location_id")
+  private LocationEntity locationEntity;
 
-    private Double height;
+  private Double height;
 
-    @Column(nullable = false)
-    private Double weight;
+  @Column(nullable = false)
+  private Double weight;
 
-    @Column(name = "passport_id", nullable = false, unique = true)
-    private String passportId;
+  @Column(name = "passport_id", nullable = false, unique = true)
+  private String passportId;
 }

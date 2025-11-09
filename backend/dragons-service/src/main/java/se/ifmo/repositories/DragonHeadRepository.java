@@ -5,5 +5,4 @@ import org.springframework.stereotype.Repository;
 import se.ifmo.models.DragonHeadEntity;
 
 @Repository
-public interface DragonHeadRepository extends JpaRepository<DragonHeadEntity, Long> {
-}
+public interface DragonHeadRepository extends JpaRepository<DragonHeadEntity, Long> {}

@@ -11,13 +11,13 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class CoordinatesEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @Column(nullable = false)
-    private Float x;
+  @Column(nullable = false)
+  private Float x;
 
-    @Column(nullable = false)
-    private Double y;
+  @Column(nullable = false)
+  private Double y;
 }

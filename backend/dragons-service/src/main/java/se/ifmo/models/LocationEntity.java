@@ -11,15 +11,15 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class LocationEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    private Double x;
+  private Double x;
 
-    @Column(nullable = false)
-    private Integer y;
+  @Column(nullable = false)
+  private Integer y;
 
-    @Column(length = 416)
-    private String name;
+  @Column(length = 416)
+  private String name;
 }

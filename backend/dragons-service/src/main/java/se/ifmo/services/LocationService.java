@@ -1,24 +1,22 @@
 package se.ifmo.services;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import se.ifmo.gen.model.Location;
 import se.ifmo.repositories.LocationRepository;
 
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 public class LocationService {
 
-    private final LocationRepository locationRepository;
-    private final ModelMapper modelMapper;
+  private final LocationRepository locationRepository;
+  private final ModelMapper modelMapper;
 
-    public List<Location> getAll() {
-        return locationRepository.findAll()
-                .stream()
-                .map(locationEntity -> modelMapper.map(locationEntity, Location.class))
-                .toList();
-    }
+  public List<Location> getAll() {
+    return locationRepository.findAll().stream()
+        .map(locationEntity -> modelMapper.map(locationEntity, Location.class))
+        .toList();
+  }
 }

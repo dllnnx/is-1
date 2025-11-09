@@ -11,10 +11,10 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class DragonHeadEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @Column(name = "tooth_count")
-    private Float toothCount;
+  @Column(name = "tooth_count")
+  private Float toothCount;
 }
