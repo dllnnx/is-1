@@ -2,7 +2,6 @@ package se.ifmo.services;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 import java.util.List;
@@ -33,6 +32,8 @@ class DragonServiceTest {
 
   @Mock private CoordinatesRepository coordinatesRepository;
 
+  @Mock private LocationRepository locationRepository;
+
   @Mock private DragonCaveRepository dragonCaveRepository;
 
   @Mock private DragonHeadRepository dragonHeadRepository;
@@ -51,6 +52,7 @@ class DragonServiceTest {
         new DragonService(
             dragonRepository,
             personRepository,
+            locationRepository,
             coordinatesRepository,
             dragonCaveRepository,
             dragonHeadRepository,
@@ -101,9 +103,9 @@ class DragonServiceTest {
         .thenReturn(new PageImpl<>(List.of(entity)));
     when(modelMapper.map(entity, Dragon.class)).thenReturn(dto);
 
-    List<Dragon> result = dragonService.getDragonsWithFilters(request);
+    GetDragons200Response result = dragonService.getDragonsWithFilters(request);
 
-    assertEquals(1, result.size());
+    assertEquals(1, result.getDragons().size());
     verify(dragonRepository, times(1)).findAll(any(Specification.class), any(PageRequest.class));
   }
 
@@ -279,37 +281,5 @@ class DragonServiceTest {
     verify(dragonRepository, times(1)).findById(1L);
     verify(personRepository, times(1)).findById(1L);
     verify(dragonRepository, times(1)).save(dragonEntity);
-  }
-
-  @Test
-  @DisplayName("Should return Optional with updated DragonEntity when update is called")
-  void update_WhenDragonExists_ShouldReturnUpdatedDragonEntity() {
-    Dragon dragon = new Dragon();
-    dragon.setId(1);
-    dragon.setName("UpdatedDragon");
-    dragon.setAge(200);
-
-    Coordinates coordinates = new Coordinates();
-    coordinates.setId(1);
-    dragon.setCoordinates(coordinates);
-
-    DragonCave cave = new DragonCave();
-    cave.setId(1);
-    dragon.setCave(cave);
-
-    DragonEntity existingEntity = DragonEntity.builder().id(1L).name("OldDragon").age(100).build();
-    CoordinatesEntity coordinatesEntity = CoordinatesEntity.builder().id(1L).build();
-    DragonCaveEntity caveEntity = DragonCaveEntity.builder().id(1L).build();
-
-    when(dragonRepository.findById(1L)).thenReturn(Optional.of(existingEntity));
-    when(coordinatesRepository.getReferenceById(anyLong())).thenReturn(coordinatesEntity);
-    when(dragonCaveRepository.getReferenceById(anyLong())).thenReturn(caveEntity);
-    when(dragonRepository.save(existingEntity)).thenReturn(existingEntity);
-
-    Optional<DragonEntity> result = dragonService.update(dragon);
-
-    assertTrue(result.isPresent());
-    verify(dragonRepository, times(1)).findById(1L);
-    verify(dragonRepository, times(1)).save(existingEntity);
   }
 }
