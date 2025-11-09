@@ -2,6 +2,7 @@ import {Button, Overlay, Sidebar, type SidebarState, useSidebar} from '@rewind-u
 import {type ReactNode, useState} from "react";
 import {BsUpload} from "../icons/BsUpload";
 import {BsHome} from "../icons/BsHome";
+import {useNavigate} from "react-router-dom";
 
 interface DragonMenuInterface {
     children: ReactNode
@@ -11,6 +12,7 @@ export const DragonMenu = ({children}: DragonMenuInterface) => {
     const [expanded, setExpanded] = useState(true);
     const [mobile, setMobile] = useState(false);
     const sidebar = useSidebar();
+    const navigate = useNavigate();
 
     return (
         <div className="relative flex flex-row w-full h-screen">
@@ -28,8 +30,8 @@ export const DragonMenu = ({children}: DragonMenuInterface) => {
                 <Sidebar.Nav>
 
                     <Sidebar.Nav.Section>
-                        <Sidebar.Nav.Section.Item icon={<BsUpload/>} label="Create new dragon" href="/create"/>
-                        <Sidebar.Nav.Section.Item icon={<BsHome/>} label="Main page" href="/"/>
+                        <Sidebar.Nav.Section.Item icon={<BsUpload/>} label="Create new dragon" onClick={() => navigate("/create")}/>
+                        <Sidebar.Nav.Section.Item icon={<BsHome/>} label="Main page" onClick={() => navigate("/")}/>
                     </Sidebar.Nav.Section>
                 </Sidebar.Nav>
             </Sidebar>
