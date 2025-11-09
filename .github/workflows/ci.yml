@@ -11,7 +11,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: ./backend/dragons-service
+        working-directory: ./backend
 
     steps:
       - name: 1. Checkout code

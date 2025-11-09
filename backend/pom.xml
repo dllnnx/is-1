@@ -45,6 +45,10 @@
                     <googleJavaFormat>
                         <version>1.17.0</version> <style>GOOGLE</style>
                     </googleJavaFormat>
+                    <excludes>
+                        <exclude>**/gen/**/*.*</exclude>
+                        <exclude>**/openapitools/**/*.*</exclude>
+                    </excludes>
                 </java>
             </configuration>
             </plugin>
