@@ -1,0 +1,43 @@
+services:
+  db:
+    image: postgres:15
+    container_name: db-dragons
+    environment:
+      - POSTGRES_DB=study
+      - POSTGRES_USER=study
+      - POSTGRES_PASSWORD=study
+    ports:
+      - 5433:5432
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    networks:
+      - backend
+  dragons:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: docker.io/dllnnx/is:dragons
+    container_name: dragons
+    ports:
+      - "8080:8080"
+    networks:
+      - backend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    image: docker.io/dllnnx/is:frontend
+    ports:
+      - "80:80"
+    networks:
+      - frontend
+
+volumes:
+  pg_data:
+
+networks:
+  backend:
+    name: backend
+  frontend:
+    name: frontend

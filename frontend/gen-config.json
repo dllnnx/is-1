@@ -1,0 +1,14 @@
+{
+  "schemaFile": "./swagger.yaml",
+  "apiFile": "./app/baseApi.ts",
+  "apiImport": "api",
+  "outputFile": "./app/gen/types.generated.ts",
+  "exportName": "dragonsApi",
+  "hooks": true,
+  "endpointOverrides": [
+    {
+      "pattern": "getDragons",
+      "type": "query"
+    }
+  ]
+}
