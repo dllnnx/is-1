@@ -2,6 +2,7 @@ package se.ifmo.services;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -14,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import se.ifmo.gen.model.*;
 import se.ifmo.models.*;
 import se.ifmo.models.Color;
+import se.ifmo.models.DragonCharacter;
 import se.ifmo.models.DragonType;
 import se.ifmo.repositories.*;
 
@@ -425,5 +427,47 @@ public class DragonService {
 
               return dragonRepository.save(existingDragon);
             });
+  }
+
+  public boolean checkDragonConsistency(Dragon dragon) {
+      // имя дракона уникально
+      if (dragonRepository.existsByName(dragon.getName())) {
+          return false;
+      }
+
+    // в одной координате не может находиться более 1 дракона
+      if (dragonRepository.existsByCoordinatesEntity(modelMapper.map(dragon.getCoordinates(), CoordinatesEntity.class))) {
+          return false;
+      }
+
+      if (dragon.getKiller().isPresent() && dragon.getKiller().get() != null) {
+          Person killer = dragon.getKiller().get();
+          // зеленоглазые люди не могут убивать добрых или мудрых драконов
+          if (killer.getEyeColor().equals(se.ifmo.gen.model.Color.GREEN)
+                  && (dragon.getCharacter().get().equals(se.ifmo.gen.model.DragonCharacter.GOOD) ||
+                  dragon.getCharacter().get().equals(se.ifmo.gen.model.DragonCharacter.WISE))
+          ) {
+              return false;
+          }
+
+          // у киллера обязательно должен быть указан рост
+          if (killer.getHeight().isPresent() && killer.getHeight().get() == null) {
+              return false;
+          }
+
+          // человек может убивать драконов возрастом в зависимости от своего ИМТ: max_age = e^{-(bmi - 70)/10}
+          if (!isCanKillDragonByBMI(killer.getWeight(), killer.getHeight().get(), dragon.getAge())) {
+              return false;
+          }
+      }
+
+      return false;
+  }
+
+  private boolean isCanKillDragonByBMI(double weight, double height, int age) {
+      double height_m = height / 100;
+      double bmi = weight / (height_m * height_m);
+      int max_age = (int) Math.floor(Math.exp(- (bmi - 70) / 10));
+      return age <= max_age;
   }
 }

@@ -7,7 +7,7 @@ services:
       - POSTGRES_USER=study
       - POSTGRES_PASSWORD=study
     ports:
-      - 5433:5432
+      - 5434:5432
     volumes:
       - pg_data:/var/lib/postgresql/data
     networks:
