@@ -10,8 +10,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.HttpClientErrorException;
 import se.ifmo.gen.model.*;
 import se.ifmo.models.*;
 import se.ifmo.models.Color;
@@ -80,12 +82,20 @@ public class DragonService {
                 .map(dragonEntity -> modelMapper.map(dragonEntity, Dragon.class));
     }
 
+    @Transactional
     public DragonEntity save(DragonCreate dragonCreate) {
         DragonEntity dragonEntity = modelMapper.map(dragonCreate, DragonEntity.class);
 
         if (dragonCreate.getCoordinates() != null) {
             CoordinatesEntity coordinatesEntity;
+
             if (dragonCreate.getCoordinates().getId() == null) {
+                if (coordinatesRepository.existsByXAndY(
+                        dragonCreate.getCoordinates().getX(), dragonCreate.getCoordinates().getY())
+                ) {
+                    throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Dragon entity is not consistent");
+                }
+
                 coordinatesEntity =
                         coordinatesRepository.save(
                                 modelMapper.map(dragonCreate.getCoordinates(), CoordinatesEntity.class));
@@ -140,6 +150,10 @@ public class DragonService {
                         dragonHeadRepository.getReferenceById(dragonCreate.getHead().get().getId().longValue());
             }
             dragonEntity.setHead(dragonHeadEntity);
+        }
+
+        if (!isDragonConsistent(dragonEntity)) {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Dragon entity is not consistent");
         }
 
         return dragonRepository.save(dragonEntity);
@@ -235,6 +249,11 @@ public class DragonService {
 
     @Transactional
     public Optional<DragonEntity> update(Dragon dragon) {
+        DragonEntity dragonEntity = modelMapper.map(dragon, DragonEntity.class);
+        if (!isDragonConsistent(dragonEntity)) {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Dragon entity is not consistent");
+        }
+
         return dragonRepository
                 .findById(dragon.getId().longValue())
                 .map(
@@ -429,14 +448,9 @@ public class DragonService {
                         });
     }
 
-    public boolean checkDragonConsistency(DragonEntity dragon) {
+    public boolean isDragonConsistent(DragonEntity dragon) {
         // имя дракона уникально
         if (dragonRepository.existsByName(dragon.getName())) {
-            return false;
-        }
-
-        // в одной координате не может находиться более 1 дракона
-        if (dragonRepository.existsByCoordinatesEntity(dragon.getCoordinatesEntity())) {
             return false;
         }
 
@@ -453,6 +467,7 @@ public class DragonService {
             if (killer.getHeight() == null) {
                 return false;
             }
+            System.out.println(killer.getHeight());
 
             // человек может убивать драконов возрастом в зависимости от своего ИМТ: max_age = e^{-(bmi - 70)/10}
             if (!isCanKillDragonByBMI(killer.getWeight(), killer.getHeight(), dragon.getAge())) {
@@ -460,7 +475,7 @@ public class DragonService {
             }
         }
 
-        return false;
+        return true;
     }
 
     private boolean isCanKillDragonByBMI(double weight, double height, int age) {
