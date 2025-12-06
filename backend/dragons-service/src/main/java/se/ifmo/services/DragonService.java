@@ -10,10 +10,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.HttpClientErrorException;
+import se.ifmo.exceptions.ConstraintsViolationException;
 import se.ifmo.gen.model.*;
 import se.ifmo.models.*;
 import se.ifmo.models.Color;
@@ -93,7 +92,7 @@ public class DragonService {
                 if (coordinatesRepository.existsByXAndY(
                         dragonCreate.getCoordinates().getX(), dragonCreate.getCoordinates().getY())
                 ) {
-                    throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Dragon entity is not consistent");
+                    throw new ConstraintsViolationException("Coordinates with such X and Y already exist.");
                 }
 
                 coordinatesEntity =
@@ -152,9 +151,7 @@ public class DragonService {
             dragonEntity.setHead(dragonHeadEntity);
         }
 
-        if (!isDragonConsistent(dragonEntity)) {
-            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Dragon entity is not consistent");
-        }
+        checkDragonConsistency(dragonEntity, false);
 
         return dragonRepository.save(dragonEntity);
     }
@@ -249,12 +246,8 @@ public class DragonService {
 
     @Transactional
     public Optional<DragonEntity> update(Dragon dragon) {
-        DragonEntity dragonEntity = modelMapper.map(dragon, DragonEntity.class);
-        if (!isDragonConsistent(dragonEntity)) {
-            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Dragon entity is not consistent");
-        }
 
-        return dragonRepository
+        Optional<DragonEntity> dragonEntity = dragonRepository
                 .findById(dragon.getId().longValue())
                 .map(
                         existingDragon -> {
@@ -446,12 +439,17 @@ public class DragonService {
 
                             return dragonRepository.save(existingDragon);
                         });
+
+        dragonEntity.ifPresent(entity -> checkDragonConsistency(entity, true));
+        return dragonEntity;
     }
 
-    public boolean isDragonConsistent(DragonEntity dragon) {
-        // имя дракона уникально
-        if (dragonRepository.existsByName(dragon.getName())) {
-            return false;
+    public void checkDragonConsistency(DragonEntity dragon, boolean isForUpdate) {
+        if (!isForUpdate) {
+            // имя дракона уникально
+            if (dragonRepository.existsByName(dragon.getName())) {
+                throw new ConstraintsViolationException("Dragon with this name already exists.");
+            }
         }
 
         if (dragon.getKiller() != null) {
@@ -460,28 +458,26 @@ public class DragonService {
             if (killer.getEyeColor() == Color.GREEN
                     && (dragon.getCharacter() == DragonCharacter.GOOD || dragon.getCharacter() == DragonCharacter.WISE)
             ) {
-                return false;
+                throw new ConstraintsViolationException("Green-eyed people can't kill GOOD or WISE dragons.");
             }
 
             // у киллера обязательно должен быть указан рост
             if (killer.getHeight() == null) {
-                return false;
+                throw new ConstraintsViolationException("Killer should have height.");
             }
             System.out.println(killer.getHeight());
 
             // человек может убивать драконов возрастом в зависимости от своего ИМТ: max_age = e^{-(bmi - 70)/10}
-            if (!isCanKillDragonByBMI(killer.getWeight(), killer.getHeight(), dragon.getAge())) {
-                return false;
+            int maxAgeToBeKilled = calculateMaxAgeForBMI(killer.getWeight(), killer.getHeight());
+            if (dragon.getAge() > maxAgeToBeKilled) {
+                throw new ConstraintsViolationException("With killer's BMI they can kill dragons no older than " + maxAgeToBeKilled + "years old.");
             }
         }
-
-        return true;
     }
 
-    private boolean isCanKillDragonByBMI(double weight, double height, int age) {
+    private int calculateMaxAgeForBMI(double weight, double height) {
         double height_m = height / 100;
         double bmi = weight / (height_m * height_m);
-        int max_age = (int) Math.floor(Math.exp(-(bmi - 70) / 10));
-        return age <= max_age;
+        return (int) Math.floor(Math.exp(-(bmi - 70) / 10));
     }
 }
