@@ -149,7 +149,7 @@ public class DragonController implements DragonsApi {
   }
 
   @Override
-  public ResponseEntity<ImportDragonResponse> importDragons(MultipartFile file, UserRole role) {
+  public ResponseEntity<ImportDragonResponse> importDragons(UserRole role, MultipartFile file) {
     se.ifmo.models.UserRole userRole = role == UserRole.ADMIN
         ? se.ifmo.models.UserRole.ADMIN
         : se.ifmo.models.UserRole.USER;

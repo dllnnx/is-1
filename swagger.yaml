@@ -898,17 +898,29 @@ paths:
           description: Bad request (e.g., new owner ID is invalid)
   /dragons/import:
     post:
-      summary: Import dragons from JSON
+      summary: Import dragons from JSON file
       operationId: importDragons
       tags:
         - Dragons
+      parameters:
+        - name: role
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/UserRole'
       requestBody:
-        description: Import request with role and dragons array
         required: true
         content:
-          application/json:
+          multipart/form-data:
             schema:
-              $ref: '#/components/schemas/ImportDragonRequest'
+              type: object
+              required:
+                - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: JSON file containing array of DragonCreate objects
       responses:
         200:
           description: Import completed (check status for success/failure)

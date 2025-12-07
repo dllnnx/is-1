@@ -902,8 +902,13 @@ paths:
       operationId: importDragons
       tags:
         - Dragons
+      parameters:
+        - name: role
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/UserRole'
       requestBody:
-        description: JSON file with dragons array and user role
         required: true
         content:
           multipart/form-data:
@@ -911,14 +916,11 @@ paths:
               type: object
               required:
                 - file
-                - role
               properties:
                 file:
                   type: string
                   format: binary
                   description: JSON file containing array of DragonCreate objects
-                role:
-                  $ref: '#/components/schemas/UserRole'
       responses:
         200:
           description: Import completed (check status for success/failure)

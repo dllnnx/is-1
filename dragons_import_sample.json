@@ -1,11 +1,11 @@
 [
   {
-    "name": "Import-1",
+    "name": "Import2222",
     "age": 500,
     "color": "RED",
     "type": "FIRE",
     "coordinates": {
-      "x": 100.5,
+      "x": 107,
       "y": 200.0
     },
     "cave": {
@@ -18,12 +18,12 @@
     }
   },
   {
-    "name": "Import-2",
+    "name": "Importa3333",
     "age": 100,
     "color": "GREEN",
     "type": "AIR",
     "coordinates": {
-      "x": 50.0,
+      "x": 53.0,
       "y": 75.5
     },
     "cave": {

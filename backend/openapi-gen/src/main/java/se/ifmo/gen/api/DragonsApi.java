@@ -556,8 +556,8 @@ public interface DragonsApi {
     /**
      * POST /dragons/import : Import dragons from JSON file
      *
-     * @param file JSON file containing array of DragonCreate objects (required)
      * @param role  (required)
+     * @param file JSON file containing array of DragonCreate objects (required)
      * @return Import completed (check status for success/failure) (status code 200)
      *         or Invalid request format (status code 400)
      */
@@ -580,8 +580,8 @@ public interface DragonsApi {
     )
     
     default ResponseEntity<ImportDragonResponse> importDragons(
-        @Parameter(name = "file", description = "JSON file containing array of DragonCreate objects", required = true) @RequestPart(value = "file", required = true) MultipartFile file,
-        @Parameter(name = "role", description = "", required = true) @Valid @RequestParam(value = "role", required = true) UserRole role
+        @NotNull @Parameter(name = "role", description = "", required = true, in = ParameterIn.QUERY) @Valid @RequestParam(value = "role", required = true) UserRole role,
+        @Parameter(name = "file", description = "JSON file containing array of DragonCreate objects", required = true) @RequestPart(value = "file", required = true) MultipartFile file
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {

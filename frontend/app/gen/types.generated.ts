@@ -1,17 +1,17 @@
-import { api } from '../baseApi';
+import { api } from "../baseApi";
 const injectedRtkApi = api.injectEndpoints({
   endpoints: (build) => ({
     createDragon: build.mutation<CreateDragonApiResponse, CreateDragonApiArg>({
       query: (queryArg) => ({
         url: `/dragons`,
-        method: 'POST',
+        method: "POST",
         body: queryArg.dragonCreate,
       }),
     }),
     updateDragon: build.mutation<UpdateDragonApiResponse, UpdateDragonApiArg>({
       query: (queryArg) => ({
         url: `/dragons`,
-        method: 'PUT',
+        method: "PUT",
         body: queryArg.dragon,
       }),
     }),
@@ -24,13 +24,13 @@ const injectedRtkApi = api.injectEndpoints({
     >({
       query: (queryArg) => ({
         url: `/dragons/${queryArg.id}`,
-        method: 'DELETE',
+        method: "DELETE",
       }),
     }),
     getDragons: build.query<GetDragonsApiResponse, GetDragonsApiArg>({
       query: (queryArg) => ({
         url: `/dragons/filter`,
-        method: 'POST',
+        method: "POST",
         body: queryArg.body,
       }),
     }),
@@ -40,7 +40,7 @@ const injectedRtkApi = api.injectEndpoints({
     >({
       query: (queryArg) => ({
         url: `/dragons/ages/${queryArg.age}`,
-        method: 'DELETE',
+        method: "DELETE",
       }),
     }),
     getDragonsAgeSum: build.query<
@@ -61,13 +61,13 @@ const injectedRtkApi = api.injectEndpoints({
     >({
       query: () => ({
         url: `/dragons/caves/delete-by-max-depth`,
-        method: 'DELETE',
+        method: "DELETE",
       }),
     }),
     killDragon: build.mutation<KillDragonApiResponse, KillDragonApiArg>({
       query: (queryArg) => ({
-        url: `/dragons/persons/${queryArg['person-id']}/kill/${queryArg['dragon-id']}`,
-        method: 'POST',
+        url: `/dragons/persons/${queryArg["person-id"]}/kill/${queryArg["dragon-id"]}`,
+        method: "POST",
       }),
     }),
     getCoordinates: build.query<
@@ -94,8 +94,32 @@ const injectedRtkApi = api.injectEndpoints({
     >({
       query: (queryArg) => ({
         url: `/dragons/${queryArg.id}/reassign-and-delete`,
-        method: 'POST',
+        method: "POST",
         body: queryArg.body,
+      }),
+    }),
+    importDragons: build.mutation<
+      ImportDragonsApiResponse,
+      ImportDragonsApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/dragons/import`,
+        method: "POST",
+        body: queryArg.body,
+        params: {
+          role: queryArg.role,
+        },
+      }),
+    }),
+    getImportHistory: build.query<
+      GetImportHistoryApiResponse,
+      GetImportHistoryApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/dragons/import/history`,
+        params: {
+          role: queryArg.role,
+        },
       }),
     }),
   }),
@@ -149,9 +173,9 @@ export type DeleteDragonsInCaveWithMaxDepthApiArg = void;
 export type KillDragonApiResponse = unknown;
 export type KillDragonApiArg = {
   /** Killer person ID */
-  'person-id': number;
+  "person-id": number;
   /** Dragon ID */
-  'dragon-id': number;
+  "dragon-id": number;
 };
 export type GetCoordinatesApiResponse = /** status 200 OK */ Coordinates[];
 export type GetCoordinatesApiArg = void;
@@ -173,6 +197,21 @@ export type ReassignAndDeleteDragonApiArg = {
     newOwnerId: number;
   };
 };
+export type ImportDragonsApiResponse =
+  /** status 200 Import completed (check status for success/failure) */ ImportDragonResponse;
+export type ImportDragonsApiArg = {
+  role: UserRole;
+  body: {
+    /** JSON file containing array of DragonCreate objects */
+    file: Blob;
+  };
+};
+export type GetImportHistoryApiResponse =
+  /** status 200 OK */ ImportOperation[];
+export type GetImportHistoryApiArg = {
+  /** User role (ADMIN sees all, USER sees only their imports) */
+  role: UserRole;
+};
 export type DragonCreateCoordinates = {
   /** Auto-generated unique ID.   Must not be null and must be greater than 0.
    */
@@ -187,7 +226,7 @@ export type DragonCreateCave = {
   depth?: number;
   numberOfTreasures?: number;
 };
-export type Color = 'GREEN' | 'RED' | 'WHITE' | 'BROWN';
+export type Color = "GREEN" | "RED" | "WHITE" | "BROWN";
 export type Location = {
   /** Auto-generated unique ID.   Must not be null and must be greater than 0.
    */
@@ -212,13 +251,13 @@ export type DragonCreatePerson = {
    */
   passportID?: string;
 };
-export type DragonType = 'WATER' | 'UNDERGROUND' | 'AIR' | 'FIRE';
+export type DragonType = "WATER" | "UNDERGROUND" | "AIR" | "FIRE";
 export type DragonCharacter =
-  | 'CUNNING'
-  | 'WISE'
-  | 'GOOD'
-  | 'CHAOTIC_EVIL'
-  | 'FICKLE';
+  | "CUNNING"
+  | "WISE"
+  | "GOOD"
+  | "CHAOTIC_EVIL"
+  | "FICKLE";
 export type DragonCreateHead = {
   /** Auto-generated unique ID.   Must not be null and must be greater than 0.
    */
@@ -304,28 +343,28 @@ export type Pagination = {
   size?: number;
 };
 export type SortingColumn =
-  | 'ID'
-  | 'NAME'
-  | 'COORDINATES_X'
-  | 'COORDINATES_Y'
-  | 'CREATION_DATE'
-  | 'CAVE_DEPTH'
-  | 'CAVE_NUMBER_OF_TREASURES'
-  | 'PERSON_NAME'
-  | 'PERSON_EYE_COLOR'
-  | 'PERSON_HAIR_COLOR'
-  | 'PERSON_LOCATION_X'
-  | 'PERSON_LOCATION_Y'
-  | 'PERSON_LOCATION_NAME'
-  | 'PERSON_HEIGHT'
-  | 'PERSON_WEIGHT'
-  | 'PERSON_PASSPORT_ID'
-  | 'AGE'
-  | 'COLOR'
-  | 'DRAGON_TYPE'
-  | 'CHARACTER'
-  | 'HEAD_TOOTH_COUNT';
-export type SortingDirection = 'ASC' | 'DESC';
+  | "ID"
+  | "NAME"
+  | "COORDINATES_X"
+  | "COORDINATES_Y"
+  | "CREATION_DATE"
+  | "CAVE_DEPTH"
+  | "CAVE_NUMBER_OF_TREASURES"
+  | "PERSON_NAME"
+  | "PERSON_EYE_COLOR"
+  | "PERSON_HAIR_COLOR"
+  | "PERSON_LOCATION_X"
+  | "PERSON_LOCATION_Y"
+  | "PERSON_LOCATION_NAME"
+  | "PERSON_HEIGHT"
+  | "PERSON_WEIGHT"
+  | "PERSON_PASSPORT_ID"
+  | "AGE"
+  | "COLOR"
+  | "DRAGON_TYPE"
+  | "CHARACTER"
+  | "HEAD_TOOTH_COUNT";
+export type SortingDirection = "ASC" | "DESC";
 export type Sorting = {
   column: SortingColumn;
   direction: SortingDirection;
@@ -398,6 +437,29 @@ export type DragonFilter = {
   character?: DragonCharacter | null;
   head?: DragonHeadFilter;
 };
+export type ImportOperationStatus = "SUCCESS" | "FAILED";
+export type ImportDragonResponse = {
+  /** Import operation ID */
+  operationId: number;
+  status: ImportOperationStatus;
+  /** Number of successfully added dragons */
+  addedCount?: number;
+  /** Error message if import failed */
+  errorMessage?: string;
+};
+export type UserRole = "ADMIN" | "USER";
+export type ImportOperation = {
+  /** Import operation ID */
+  id: number;
+  status: ImportOperationStatus;
+  userRole: UserRole;
+  /** Number of successfully added dragons (only for SUCCESS status) */
+  addedCount?: number;
+  /** Error message (only for FAILED status) */
+  errorMessage?: string;
+  /** When the import operation was created */
+  createdAt: string;
+};
 export const {
   useCreateDragonMutation,
   useUpdateDragonMutation,
@@ -415,4 +477,6 @@ export const {
   useGetHeadsQuery,
   useGetLocationsQuery,
   useReassignAndDeleteDragonMutation,
+  useImportDragonsMutation,
+  useGetImportHistoryQuery,
 } = injectedRtkApi;

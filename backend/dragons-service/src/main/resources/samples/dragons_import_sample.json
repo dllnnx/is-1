@@ -1,0 +1,97 @@
+[
+  {
+    "name": "Smaug",
+    "age": 500,
+    "color": "RED",
+    "type": "FIRE",
+    "coordinates": {
+      "x": 100.5,
+      "y": 200.0
+    },
+    "cave": {
+      "depth": 1000.0,
+      "numberOfTreasures": 999999
+    },
+    "character": "CUNNING",
+    "head": {
+      "toothCount": 150.0
+    }
+  },
+  {
+    "name": "Draco",
+    "age": 100,
+    "color": "GREEN",
+    "type": "AIR",
+    "coordinates": {
+      "x": 50.0,
+      "y": 75.5
+    },
+    "cave": {
+      "depth": 200.0,
+      "numberOfTreasures": 500
+    },
+    "character": "WISE",
+    "head": {
+      "toothCount": 80.0
+    }
+  },
+  {
+    "name": "Falkor",
+    "age": 300,
+    "color": "WHITE",
+    "type": "AIR",
+    "coordinates": {
+      "x": 180.0,
+      "y": 400.0
+    },
+    "cave": {
+      "depth": 50.0,
+      "numberOfTreasures": 100
+    },
+    "character": "GOOD"
+  },
+  {
+    "name": "Viserion",
+    "age": 150,
+    "color": "WHITE",
+    "type": "FIRE",
+    "coordinates": {
+      "x": 120.0,
+      "y": 250.0
+    },
+    "cave": {
+      "depth": 800.0,
+      "numberOfTreasures": 50000
+    },
+    "killer": {
+      "name": "Night King",
+      "eyeColor": "WHITE",
+      "weight": 90.0,
+      "height": 200.0,
+      "passportID": "NK-001"
+    },
+    "character": "CHAOTIC_EVIL",
+    "head": {
+      "toothCount": 120.0
+    }
+  },
+  {
+    "name": "Toothless",
+    "age": 50,
+    "color": "BROWN",
+    "type": "UNDERGROUND",
+    "coordinates": {
+      "x": 85.0,
+      "y": 150.0
+    },
+    "cave": {
+      "depth": 500.0,
+      "numberOfTreasures": 250
+    },
+    "character": "GOOD",
+    "head": {
+      "toothCount": 0.0
+    }
+  }
+]
+

@@ -2,6 +2,7 @@ import React from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { TablePage } from './views/TablePage';
 import { CreateDragonPage } from './views/CreateDragonPage';
+import { ImportPage } from './views/ImportPage';
 import { DragonMenu } from './containers/SideBar';
 
 export const ApplicationRoutes: React.FC = () => {
@@ -12,6 +13,14 @@ export const ApplicationRoutes: React.FC = () => {
         element={
           <DragonMenu>
             <CreateDragonPage />
+          </DragonMenu>
+        }
+      />
+      <Route
+        path="/import"
+        element={
+          <DragonMenu>
+            <ImportPage />
           </DragonMenu>
         }
       />
