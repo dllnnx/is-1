@@ -11,7 +11,7 @@ services:
     volumes:
       - pg_data:/var/lib/postgresql/data
     networks:
-      - backend
+      - is-backend
   dragons:
     build:
       context: ./backend
@@ -21,23 +21,24 @@ services:
     ports:
       - "8080:8080"
     networks:
-      - backend
+      - is-backend
+      - is-frontend
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: frontend
+    container_name: is-frontend
     image: docker.io/dllnnx/is:frontend
     ports:
       - "80:80"
     networks:
-      - frontend
+      - is-frontend
 
 volumes:
   pg_data:
 
 networks:
-  backend:
-    name: backend
-  frontend:
-    name: frontend
+  is-backend:
+    name: is-backend
+  is-frontend:
+    name: is-frontend

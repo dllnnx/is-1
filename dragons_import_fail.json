@@ -1,0 +1,46 @@
+[
+  {
+    "name": "Import-4",
+    "age": 500,
+    "color": "RED",
+    "type": "FIRE",
+    "coordinates": {
+      "x": 50,
+      "y": 200.0
+    },
+    "cave": {
+      "depth": 1000.0,
+      "numberOfTreasures": 999999
+    },
+    "killer": {
+      "name": "Night King",
+      "eyeColor": "GREEN",
+      "weight": 90.0,
+      "height": 200.0,
+      "passportID": "NK-001"
+    },
+    "character": "GOOD",
+    "head": {
+      "toothCount": 150.0
+    }
+  },
+  {
+    "name": "Import-3",
+    "age": 100,
+    "color": "GREEN",
+    "type": "AIR",
+    "coordinates": {
+      "x": 100,
+      "y": 75.5
+    },
+    "cave": {
+      "depth": 200.0,
+      "numberOfTreasures": 500
+    },
+    "character": "WISE",
+    "head": {
+      "toothCount": 80.0
+    }
+  }
+]
+

@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 import se.ifmo.gen.api.DragonsApi;
 import se.ifmo.gen.model.*;
@@ -21,6 +22,7 @@ public class DragonController implements DragonsApi {
   private final CoordinatesService coordinatesService;
   private final LocationService locationService;
   private final PersonService personService;
+  private final ImportService importService;
   private final ModelMapper modelMapper;
 
   @Override
@@ -144,5 +146,25 @@ public class DragonController implements DragonsApi {
       return ResponseEntity.noContent().build();
     }
     return ResponseEntity.notFound().build();
+  }
+
+  @Override
+  public ResponseEntity<ImportDragonResponse> importDragons(MultipartFile file, UserRole role) {
+    se.ifmo.models.UserRole userRole = role == UserRole.ADMIN
+        ? se.ifmo.models.UserRole.ADMIN
+        : se.ifmo.models.UserRole.USER;
+
+    ImportDragonResponse response = importService.importDragonsFromFile(file, userRole);
+    return ResponseEntity.ok(response);
+  }
+
+  @Override
+  public ResponseEntity<List<ImportOperation>> getImportHistory(UserRole role) {
+    se.ifmo.models.UserRole userRole = role == UserRole.ADMIN
+        ? se.ifmo.models.UserRole.ADMIN
+        : se.ifmo.models.UserRole.USER;
+
+    List<ImportOperation> history = importService.getImportHistory(userRole);
+    return ResponseEntity.ok(history);
   }
 }

@@ -534,6 +534,75 @@ components:
           type: string
           format: date-time
           description: "End date and time."
+    UserRole:
+      type: string
+      enum:
+        - ADMIN
+        - USER
+    ImportOperationStatus:
+      type: string
+      enum:
+        - SUCCESS
+        - FAILED
+    ImportOperation:
+      type: object
+      required:
+        - id
+        - status
+        - userRole
+        - createdAt
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: Import operation ID
+        status:
+          $ref: '#/components/schemas/ImportOperationStatus'
+        userRole:
+          $ref: '#/components/schemas/UserRole'
+        addedCount:
+          type: integer
+          format: int32
+          description: Number of successfully added dragons (only for SUCCESS status)
+        errorMessage:
+          type: string
+          description: Error message (only for FAILED status)
+        createdAt:
+          type: string
+          format: date-time
+          description: When the import operation was created
+    ImportDragonRequest:
+      type: object
+      required:
+        - role
+        - dragons
+      properties:
+        role:
+          $ref: '#/components/schemas/UserRole'
+        dragons:
+          type: array
+          items:
+            $ref: '#/components/schemas/DragonCreate'
+          description: Array of dragons to import
+    ImportDragonResponse:
+      type: object
+      required:
+        - operationId
+        - status
+      properties:
+        operationId:
+          type: integer
+          format: int32
+          description: Import operation ID
+        status:
+          $ref: '#/components/schemas/ImportOperationStatus'
+        addedCount:
+          type: integer
+          format: int32
+          description: Number of successfully added dragons
+        errorMessage:
+          type: string
+          description: Error message if import failed
 paths:
   /dragons:
     post:
@@ -827,3 +896,57 @@ paths:
           description: Dragon not found
         400:
           description: Bad request (e.g., new owner ID is invalid)
+  /dragons/import:
+    post:
+      summary: Import dragons from JSON file
+      operationId: importDragons
+      tags:
+        - Dragons
+      requestBody:
+        description: JSON file with dragons array and user role
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+                - role
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: JSON file containing array of DragonCreate objects
+                role:
+                  $ref: '#/components/schemas/UserRole'
+      responses:
+        200:
+          description: Import completed (check status for success/failure)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportDragonResponse'
+        400:
+          description: Invalid request format
+  /dragons/import/history:
+    get:
+      summary: Get import operation history
+      operationId: getImportHistory
+      tags:
+        - Dragons
+      parameters:
+        - name: role
+          in: query
+          description: User role (ADMIN sees all, USER sees only their imports)
+          required: true
+          schema:
+            $ref: '#/components/schemas/UserRole'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ImportOperation'

@@ -12,9 +12,12 @@ import se.ifmo.gen.model.DragonCreate;
 import se.ifmo.gen.model.DragonHead;
 import se.ifmo.gen.model.GetDragons200Response;
 import se.ifmo.gen.model.GetDragonsRequest;
+import se.ifmo.gen.model.ImportDragonResponse;
+import se.ifmo.gen.model.ImportOperation;
 import se.ifmo.gen.model.Location;
 import se.ifmo.gen.model.Person;
 import se.ifmo.gen.model.ReassignAndDeleteDragonRequest;
+import se.ifmo.gen.model.UserRole;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -392,6 +395,46 @@ public interface DragonsApi {
     }
 
 
+    public static final String PATH_GET_IMPORT_HISTORY = "/dragons/import/history";
+    /**
+     * GET /dragons/import/history : Get import operation history
+     *
+     * @param role User role (ADMIN sees all, USER sees only their imports) (required)
+     * @return OK (status code 200)
+     */
+    @Operation(
+        operationId = "getImportHistory",
+        summary = "Get import operation history",
+        tags = { "Dragons" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "OK", content = {
+                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = ImportOperation.class)))
+            })
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.GET,
+        value = DragonsApi.PATH_GET_IMPORT_HISTORY,
+        produces = { "application/json" }
+    )
+    
+    default ResponseEntity<List<ImportOperation>> getImportHistory(
+        @NotNull @Parameter(name = "role", description = "User role (ADMIN sees all, USER sees only their imports)", required = true, in = ParameterIn.QUERY) @Valid @RequestParam(value = "role", required = true) UserRole role
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "[ { \"createdAt\" : \"2000-01-23T04:56:07.000+00:00\", \"errorMessage\" : \"errorMessage\", \"id\" : 0, \"userRole\" : \"ADMIN\", \"addedCount\" : 6, \"status\" : \"SUCCESS\" }, { \"createdAt\" : \"2000-01-23T04:56:07.000+00:00\", \"errorMessage\" : \"errorMessage\", \"id\" : 0, \"userRole\" : \"ADMIN\", \"addedCount\" : 6, \"status\" : \"SUCCESS\" } ]";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
     public static final String PATH_GET_LOCATIONS = "/dragons/locations";
     /**
      * GET /dragons/locations : Get all locations
@@ -499,6 +542,51 @@ public interface DragonsApi {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
                     String exampleString = "[ { \"eyeColor\" : \"GREEN\", \"name\" : \"name\", \"weight\" : 0.14658229805029452, \"location\" : \"\", \"id\" : 1, \"hairColor\" : \"\", \"passportID\" : \"passportID\", \"height\" : 0.6027466183070403 }, { \"eyeColor\" : \"GREEN\", \"name\" : \"name\", \"weight\" : 0.14658229805029452, \"location\" : \"\", \"id\" : 1, \"hairColor\" : \"\", \"passportID\" : \"passportID\", \"height\" : 0.6027466183070403 } ]";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    public static final String PATH_IMPORT_DRAGONS = "/dragons/import";
+    /**
+     * POST /dragons/import : Import dragons from JSON file
+     *
+     * @param file JSON file containing array of DragonCreate objects (required)
+     * @param role  (required)
+     * @return Import completed (check status for success/failure) (status code 200)
+     *         or Invalid request format (status code 400)
+     */
+    @Operation(
+        operationId = "importDragons",
+        summary = "Import dragons from JSON file",
+        tags = { "Dragons" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Import completed (check status for success/failure)", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = ImportDragonResponse.class))
+            }),
+            @ApiResponse(responseCode = "400", description = "Invalid request format")
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = DragonsApi.PATH_IMPORT_DRAGONS,
+        produces = { "application/json" },
+        consumes = { "multipart/form-data" }
+    )
+    
+    default ResponseEntity<ImportDragonResponse> importDragons(
+        @Parameter(name = "file", description = "JSON file containing array of DragonCreate objects", required = true) @RequestPart(value = "file", required = true) MultipartFile file,
+        @Parameter(name = "role", description = "", required = true) @Valid @RequestParam(value = "role", required = true) UserRole role
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"errorMessage\" : \"errorMessage\", \"operationId\" : 0, \"addedCount\" : 6, \"status\" : \"SUCCESS\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }

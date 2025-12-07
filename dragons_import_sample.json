@@ -1,0 +1,39 @@
+[
+  {
+    "name": "Import-1",
+    "age": 500,
+    "color": "RED",
+    "type": "FIRE",
+    "coordinates": {
+      "x": 100.5,
+      "y": 200.0
+    },
+    "cave": {
+      "depth": 1000.0,
+      "numberOfTreasures": 999999
+    },
+    "character": "CUNNING",
+    "head": {
+      "toothCount": 150.0
+    }
+  },
+  {
+    "name": "Import-2",
+    "age": 100,
+    "color": "GREEN",
+    "type": "AIR",
+    "coordinates": {
+      "x": 50.0,
+      "y": 75.5
+    },
+    "cave": {
+      "depth": 200.0,
+      "numberOfTreasures": 500
+    },
+    "character": "WISE",
+    "head": {
+      "toothCount": 80.0
+    }
+  }
+]
+
