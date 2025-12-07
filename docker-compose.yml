@@ -18,6 +18,9 @@ services:
       dockerfile: Dockerfile
     image: docker.io/dllnnx/is:dragons
     container_name: dragons
+    environment:
+      - DATABASE_HOST=db
+      - DATABASE_PORT=5432
     ports:
       - "8080:8080"
     networks:
