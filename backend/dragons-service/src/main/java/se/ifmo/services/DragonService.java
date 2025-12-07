@@ -3,7 +3,6 @@ package se.ifmo.services;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -11,6 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import se.ifmo.exceptions.ConstraintsViolationException;
 import se.ifmo.gen.model.*;
@@ -81,7 +81,7 @@ public class DragonService {
                 .map(dragonEntity -> modelMapper.map(dragonEntity, Dragon.class));
     }
 
-    @Transactional
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public DragonEntity save(DragonCreate dragonCreate) {
         DragonEntity dragonEntity = modelMapper.map(dragonCreate, DragonEntity.class);
 
@@ -122,6 +122,9 @@ public class DragonService {
         if (dragonCreate.getKiller().isPresent() && dragonCreate.getKiller().get() != null) {
             PersonEntity personEntity;
             if (dragonCreate.getKiller().get().getId() == null) {
+                if (personRepository.existsByPassportId(dragonCreate.getKiller().get().getPassportID())) {
+                    throw new ConstraintsViolationException("Person with this passport ID already exists.");
+                }
                 PersonEntity transientPerson =
                         modelMapper.map(dragonCreate.getKiller().get(), PersonEntity.class);
                 if (transientPerson.getLocationEntity() != null
@@ -206,7 +209,7 @@ public class DragonService {
         return false;
     }
 
-    @Transactional
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public boolean reassignAndDelete(Long dragonIdToDelete, Integer newOwnerDragonId) {
         Optional<DragonEntity> dragonToDeleteOpt = dragonRepository.findById(dragonIdToDelete);
         if (dragonToDeleteOpt.isEmpty()) {
@@ -244,7 +247,7 @@ public class DragonService {
         return true;
     }
 
-    @Transactional
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public Optional<DragonEntity> update(Dragon dragon) {
 
         Optional<DragonEntity> dragonEntity = dragonRepository
@@ -465,12 +468,15 @@ public class DragonService {
             if (killer.getHeight() == null) {
                 throw new ConstraintsViolationException("Killer should have height.");
             }
-            System.out.println(killer.getHeight());
 
             // человек может убивать драконов возрастом в зависимости от своего ИМТ: max_age = e^{-(bmi - 70)/10}
             int maxAgeToBeKilled = calculateMaxAgeForBMI(killer.getWeight(), killer.getHeight());
             if (dragon.getAge() > maxAgeToBeKilled) {
                 throw new ConstraintsViolationException("With killer's BMI they can kill dragons no older than " + maxAgeToBeKilled + "years old.");
+            }
+
+            if (personRepository.countByPassportId(dragon.getKiller().getPassportId()) > 1) {
+                throw new ConstraintsViolationException("Killer with this passport ID already exists.");
             }
         }
     }

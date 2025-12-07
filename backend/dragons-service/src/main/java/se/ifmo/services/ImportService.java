@@ -6,7 +6,9 @@ import java.util.List;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -30,7 +32,8 @@ public class ImportService {
         try {
             List<DragonCreate> dragons = objectMapper.readValue(
                     file.getInputStream(),
-                    new TypeReference<List<DragonCreate>>() {}
+                    new TypeReference<List<DragonCreate>>() {
+                    }
             );
             return importDragons(dragons, userRole);
         } catch (IOException e) {
@@ -53,6 +56,9 @@ public class ImportService {
                     .status(ImportOperationStatus.SUCCESS)
                     .addedCount(count);
 
+        } catch (CannotAcquireLockException e) {
+            saveFailedOperation(userRole, "Concurrent modification conflict");
+            throw e;
         } catch (Exception e) {
             ImportOperationEntity saved = saveFailedOperation(userRole, e.getMessage());
 
@@ -64,7 +70,7 @@ public class ImportService {
         }
     }
 
-    @Transactional
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public int performImport(List<DragonCreate> dragons) {
         int count = 0;
         for (DragonCreate dragonCreate : dragons) {
@@ -74,7 +80,7 @@ public class ImportService {
         return count;
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional(isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRES_NEW)
     public ImportOperationEntity saveSuccessOperation(UserRole userRole, int count) {
         ImportOperationEntity operation = ImportOperationEntity.builder()
                 .userRole(userRole)
@@ -84,7 +90,7 @@ public class ImportService {
         return importOperationRepository.save(operation);
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional(isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRES_NEW)
     public ImportOperationEntity saveFailedOperation(UserRole userRole, String errorMessage) {
         ImportOperationEntity operation = ImportOperationEntity.builder()
                 .userRole(userRole)
@@ -112,11 +118,11 @@ public class ImportService {
     private ImportOperation mapToImportOperation(ImportOperationEntity entity) {
         ImportOperation operation = new ImportOperation()
                 .id(entity.getId().intValue())
-                .status(entity.getStatus() == ImportStatus.SUCCESS 
-                        ? ImportOperationStatus.SUCCESS 
+                .status(entity.getStatus() == ImportStatus.SUCCESS
+                        ? ImportOperationStatus.SUCCESS
                         : ImportOperationStatus.FAILED)
-                .userRole(entity.getUserRole() == UserRole.ADMIN 
-                        ? se.ifmo.gen.model.UserRole.ADMIN 
+                .userRole(entity.getUserRole() == UserRole.ADMIN
+                        ? se.ifmo.gen.model.UserRole.ADMIN
                         : se.ifmo.gen.model.UserRole.USER)
                 .createdAt(entity.getCreatedAt());
 

@@ -1,7 +1,10 @@
 import { useState, useRef } from 'react';
 import toast from 'react-hot-toast';
-import { type UserRole, useGetImportHistoryQuery } from '~/gen/types.generated';
-import { useImportDragonsWithFileMutation } from '~/baseApi';
+import {
+  type UserRole,
+  useGetImportHistoryQuery,
+  useImportDragonsMutation,
+} from '~/gen/types.generated';
 
 export const ImportPage = () => {
   const [role, setRole] = useState<UserRole>('USER');
@@ -9,7 +12,7 @@ export const ImportPage = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { data: history, refetch: refetchHistory } = useGetImportHistoryQuery({ role });
-  const [importDragons, { isLoading: isImporting }] = useImportDragonsWithFileMutation();
+  const [importDragons, { isLoading: isImporting }] = useImportDragonsMutation();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
@@ -25,7 +28,13 @@ export const ImportPage = () => {
     }
 
     try {
-      const result = await importDragons({ role, file }).unwrap();
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      const result = await importDragons({
+        role,
+        body: formData,
+      }).unwrap();
 
       if (result.status === 'SUCCESS') {
         toast.success(`Imported ${result.addedCount} dragons`);

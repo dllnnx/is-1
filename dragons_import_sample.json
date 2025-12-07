@@ -1,12 +1,12 @@
 [
   {
-    "name": "Import2222",
+    "name": "Import-jmeter",
     "age": 500,
     "color": "RED",
     "type": "FIRE",
     "coordinates": {
-      "x": 107,
-      "y": 200.0
+      "x": 14,
+      "y": 20.0
     },
     "cave": {
       "depth": 1000.0,
@@ -18,13 +18,13 @@
     }
   },
   {
-    "name": "Importa3333",
+    "name": "Importa3333-jmeter",
     "age": 100,
     "color": "GREEN",
     "type": "AIR",
     "coordinates": {
       "x": 53.0,
-      "y": 75.5
+      "y": 7.5
     },
     "cave": {
       "depth": 200.0,
