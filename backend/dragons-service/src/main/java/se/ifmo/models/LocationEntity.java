@@ -2,6 +2,8 @@ package se.ifmo.models;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 @Entity
 @Table(name = "location")
@@ -10,6 +12,8 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class LocationEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

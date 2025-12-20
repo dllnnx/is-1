@@ -1,0 +1,22 @@
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.ehcache.org/v3"
+        xsi:schemaLocation="http://www.ehcache.org/v3 http://www.ehcache.org/schema/ehcache-core-3.0.xsd">
+
+    <cache-template name="default">
+        <expiry>
+            <ttl unit="seconds">300</ttl>
+        </expiry>
+        <resources>
+            <heap unit="entries">1000</heap>
+            <offheap unit="MB">10</offheap>
+        </resources>
+    </cache-template>
+
+    <cache alias="se.ifmo.models.DragonEntity" uses-template="default"/>
+    <cache alias="se.ifmo.models.CoordinatesEntity" uses-template="default"/>
+    <cache alias="se.ifmo.models.DragonCaveEntity" uses-template="default"/>
+    <cache alias="se.ifmo.models.DragonHeadEntity" uses-template="default"/>
+    <cache alias="se.ifmo.models.LocationEntity" uses-template="default"/>
+    <cache alias="se.ifmo.models.PersonEntity" uses-template="default"/>
+
+</config>
