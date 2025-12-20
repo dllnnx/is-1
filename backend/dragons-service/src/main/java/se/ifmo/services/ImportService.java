@@ -47,7 +47,7 @@ public class ImportService {
             ImportDragonResponse response = importDragons(dragons, userRole, tempFileKey);
 
             // если мы здесь то транзакция бд была успешной
-            // 1 фаза: commit (перемещаем файлы во постоянное хранилище)
+            // 2 фаза: commit (перемещаем файлы во постоянное хранилище)
             if (response.getStatus() == ImportOperationStatus.SUCCESS) {
                 permanentFileKey = fileStorageService.commitFileStorage(tempFileKey);
                 updateImportOperationFileKey(response.getOperationId(), permanentFileKey);
