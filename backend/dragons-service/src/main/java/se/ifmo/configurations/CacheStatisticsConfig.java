@@ -37,7 +37,7 @@ public class CacheStatisticsConfig {
             return joinPoint.proceed();
         }
         
-        Statistics stats = EntityManagerFactoryUtils.getEntityManagerFactory(entityManagerFactory)
+        Statistics stats = entityManagerFactory
                 .unwrap(org.hibernate.SessionFactory.class)
                 .getStatistics();
 
