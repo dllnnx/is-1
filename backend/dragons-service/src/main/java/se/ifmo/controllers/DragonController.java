@@ -1,9 +1,14 @@
 package se.ifmo.controllers;
 
+import java.io.InputStream;
 import java.net.URI;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -166,5 +171,35 @@ public class DragonController implements DragonsApi {
 
     List<ImportOperation> history = importService.getImportHistory(userRole);
     return ResponseEntity.ok(history);
+  }
+
+  @Override
+  public ResponseEntity<Resource> downloadImportFile(Integer operationId, UserRole role) {
+    try {
+      se.ifmo.models.UserRole userRole = role == UserRole.ADMIN
+          ? se.ifmo.models.UserRole.ADMIN
+          : se.ifmo.models.UserRole.USER;
+          
+      List<ImportOperation> history = importService.getImportHistory(userRole);
+      
+      ImportOperation operation = history.stream()
+          .filter(op -> op.getId().equals(operationId))
+          .findFirst()
+          .orElse(null);
+          
+      if (operation == null || operation.getFileKey() == null) {
+        return ResponseEntity.notFound().build();
+      }
+      
+      InputStream fileStream = importService.getFile(operation.getFileKey());
+      InputStreamResource resource = new InputStreamResource(fileStream);
+      
+      return ResponseEntity.ok()
+          .contentType(MediaType.APPLICATION_OCTET_STREAM)
+          .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"import_" + operationId + ".json\"")
+          .body(resource);
+    } catch (Exception e) {
+      return ResponseEntity.internalServerError().build();
+    }
   }
 }

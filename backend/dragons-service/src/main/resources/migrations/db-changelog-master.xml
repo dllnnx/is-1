@@ -13,4 +13,7 @@
     <changeSet id="1761092281" author="dllnnx">
         <sqlFile path="1761092281_create_import_table.sql" relativeToChangelogFile="true"/>
     </changeSet>
+    <changeSet id="1761092282" author="nestor">
+        <sqlFile path="1761092282_add_file_reference_to_import_table.sql" relativeToChangelogFile="true"/>
+    </changeSet>
 </databaseChangeLog>

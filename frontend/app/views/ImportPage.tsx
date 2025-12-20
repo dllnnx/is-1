@@ -6,6 +6,47 @@ import {
   useImportDragonsMutation,
 } from '~/gen/types.generated';
 
+const DownloadButton = ({ operationId, role }: { operationId: number; role: UserRole }) => {
+  const [isLoading, setIsLoading] = useState(false);
+  
+  const handleDownload = async () => {
+    setIsLoading(true);
+    try {
+      const url = `http://localhost:8090/dragons/import/files/${operationId}?role=${role}`;
+      
+      const response = await fetch(url);
+      
+      if (response.ok) {
+        const blob = await response.blob();
+        const downloadUrl = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = downloadUrl;
+        link.setAttribute('download', `import-${operationId}.json`);
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.URL.revokeObjectURL(downloadUrl);
+      } else {
+        toast.error('Failed to download file');
+      }
+    } catch (error) {
+      toast.error('Failed to download file');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <button
+      onClick={handleDownload}
+      disabled={isLoading}
+      className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm disabled:opacity-50"
+    >
+      {isLoading ? 'Downloading...' : 'Download'}
+    </button>
+  );
+};
+
 export const ImportPage = () => {
   const [role, setRole] = useState<UserRole>('USER');
   const [file, setFile] = useState<File | null>(null);
@@ -33,6 +74,7 @@ export const ImportPage = () => {
       
       const result = await importDragons({
         role,
+        // @ts-ignore
         body: formData,
       }).unwrap();
 
@@ -108,6 +150,7 @@ export const ImportPage = () => {
               <th className="border border-gray-300 px-4 py-2">Added Count</th>
               <th className="border border-gray-300 px-4 py-2">Error</th>
               <th className="border border-gray-300 px-4 py-2">Created At</th>
+              <th className="border border-gray-300 px-4 py-2">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -133,6 +176,13 @@ export const ImportPage = () => {
                   </td>
                   <td className="border border-gray-300 px-4 py-2">
                     {new Date(op.createdAt).toLocaleString()}
+                  </td>
+                  <td className="border border-gray-300 px-4 py-2">
+                    {op.fileKey ? (
+                      <DownloadButton operationId={op.id} role={role} />
+                    ) : (
+                      '—'
+                    )}
                   </td>
                 </tr>
               ))

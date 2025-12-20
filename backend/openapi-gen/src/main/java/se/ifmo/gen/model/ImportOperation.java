@@ -37,6 +37,8 @@ public class ImportOperation {
 
   private @Nullable String errorMessage;
 
+  private @Nullable String fileKey;
+
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private OffsetDateTime createdAt;
 
@@ -154,6 +156,26 @@ public class ImportOperation {
     this.errorMessage = errorMessage;
   }
 
+  public ImportOperation fileKey(@Nullable String fileKey) {
+    this.fileKey = fileKey;
+    return this;
+  }
+
+  /**
+   * Key of the imported file in the storage
+   * @return fileKey
+   */
+  
+  @Schema(name = "fileKey", description = "Key of the imported file in the storage", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("fileKey")
+  public @Nullable String getFileKey() {
+    return fileKey;
+  }
+
+  public void setFileKey(@Nullable String fileKey) {
+    this.fileKey = fileKey;
+  }
+
   public ImportOperation createdAt(OffsetDateTime createdAt) {
     this.createdAt = createdAt;
     return this;
@@ -188,12 +210,13 @@ public class ImportOperation {
         Objects.equals(this.userRole, importOperation.userRole) &&
         Objects.equals(this.addedCount, importOperation.addedCount) &&
         Objects.equals(this.errorMessage, importOperation.errorMessage) &&
+        Objects.equals(this.fileKey, importOperation.fileKey) &&
         Objects.equals(this.createdAt, importOperation.createdAt);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, status, userRole, addedCount, errorMessage, createdAt);
+    return Objects.hash(id, status, userRole, addedCount, errorMessage, fileKey, createdAt);
   }
 
   @Override
@@ -205,6 +228,7 @@ public class ImportOperation {
     sb.append("    userRole: ").append(toIndentedString(userRole)).append("\n");
     sb.append("    addedCount: ").append(toIndentedString(addedCount)).append("\n");
     sb.append("    errorMessage: ").append(toIndentedString(errorMessage)).append("\n");
+    sb.append("    fileKey: ").append(toIndentedString(fileKey)).append("\n");
     sb.append("    createdAt: ").append(toIndentedString(createdAt)).append("\n");
     sb.append("}");
     return sb.toString();

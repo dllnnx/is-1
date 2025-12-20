@@ -30,8 +30,10 @@ public class ImportOperationEntity {
     @Column(name = "error_message")
     private String errorMessage;
 
+    @Column(name = "file_key")
+    private String fileKey;
+
     @Builder.Default
     @Column(name = "created_at", nullable = false)
     private OffsetDateTime createdAt = OffsetDateTime.now();
 }
-

@@ -1,6 +1,7 @@
 package se.ifmo.services;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -27,46 +28,80 @@ public class ImportService {
     private final DragonService dragonService;
     private final ImportOperationRepository importOperationRepository;
     private final ObjectMapper objectMapper;
+    private final FileStorageService fileStorageService;
 
     public ImportDragonResponse importDragonsFromFile(MultipartFile file, UserRole userRole) {
+        String tempFileKey = null;
+        String permanentFileKey;
+        
         try {
+            // 1 фаза: prepare (временно кладем файл в минио)
+            tempFileKey = fileStorageService.prepareFileStorage(file);
+            
             List<DragonCreate> dragons = objectMapper.readValue(
                     file.getInputStream(),
-                    new TypeReference<List<DragonCreate>>() {
+                    new TypeReference<>() {
                     }
             );
-            return importDragons(dragons, userRole);
+            
+            ImportDragonResponse response = importDragons(dragons, userRole, tempFileKey);
+
+            // если мы здесь то транзакция бд была успешной
+            // 1 фаза: commit (перемещаем файлы во постоянное хранилище)
+            if (response.getStatus() == ImportOperationStatus.SUCCESS) {
+                permanentFileKey = fileStorageService.commitFileStorage(tempFileKey);
+                updateImportOperationFileKey(response.getOperationId(), permanentFileKey);
+                response.setFileKey(permanentFileKey);
+            } else {
+                fileStorageService.rollbackFileStorage(tempFileKey);
+            }
+            
+            return response;
         } catch (IOException e) {
-            ImportOperationEntity saved = saveFailedOperation(userRole, "Failed to parse JSON file: " + e.getMessage());
+            // роллбэк
+            if (tempFileKey != null) {
+                fileStorageService.rollbackFileStorage(tempFileKey);
+            }
+            
+            ImportOperationEntity saved = saveFailedOperation(userRole, "Failed to parse JSON file: " + e.getMessage(), null);
             return new ImportDragonResponse()
                     .operationId(saved.getId().intValue())
                     .status(ImportOperationStatus.FAILED)
                     .addedCount(0)
                     .errorMessage("Failed to parse JSON file: " + e.getMessage());
+        } catch (RuntimeException e) {
+            // роллбэк
+            if (tempFileKey != null) {
+                fileStorageService.rollbackFileStorage(tempFileKey);
+            }
+            
+            throw e;
         }
     }
 
-    public ImportDragonResponse importDragons(List<DragonCreate> dragons, UserRole userRole) {
+    public ImportDragonResponse importDragons(List<DragonCreate> dragons, UserRole userRole, String tempFileKey) {
         try {
             int count = performImport(dragons);
-            ImportOperationEntity saved = saveSuccessOperation(userRole, count);
+            ImportOperationEntity saved = saveSuccessOperation(userRole, count, tempFileKey);
 
             return new ImportDragonResponse()
                     .operationId(saved.getId().intValue())
                     .status(ImportOperationStatus.SUCCESS)
-                    .addedCount(count);
+                    .addedCount(count)
+                    .fileKey(tempFileKey);
 
         } catch (CannotAcquireLockException e) {
-            saveFailedOperation(userRole, "Concurrent modification conflict");
+            saveFailedOperation(userRole, "Concurrent modification conflict", tempFileKey);
             throw e;
         } catch (Exception e) {
-            ImportOperationEntity saved = saveFailedOperation(userRole, e.getMessage());
+            ImportOperationEntity saved = saveFailedOperation(userRole, e.getMessage(), tempFileKey);
 
             return new ImportDragonResponse()
                     .operationId(saved.getId().intValue())
                     .status(ImportOperationStatus.FAILED)
                     .addedCount(0)
-                    .errorMessage(e.getMessage());
+                    .errorMessage(e.getMessage())
+                    .fileKey(tempFileKey);
         }
     }
 
@@ -81,24 +116,31 @@ public class ImportService {
     }
 
     @Transactional(isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRES_NEW)
-    public ImportOperationEntity saveSuccessOperation(UserRole userRole, int count) {
+    public ImportOperationEntity saveSuccessOperation(UserRole userRole, int count, String fileKey) {
         ImportOperationEntity operation = ImportOperationEntity.builder()
                 .userRole(userRole)
                 .status(ImportStatus.SUCCESS)
                 .addedCount(count)
+                .fileKey(fileKey)
                 .build();
         return importOperationRepository.save(operation);
     }
 
     @Transactional(isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRES_NEW)
-    public ImportOperationEntity saveFailedOperation(UserRole userRole, String errorMessage) {
+    public ImportOperationEntity saveFailedOperation(UserRole userRole, String errorMessage, String fileKey) {
         ImportOperationEntity operation = ImportOperationEntity.builder()
                 .userRole(userRole)
                 .status(ImportStatus.FAILED)
                 .addedCount(0)
                 .errorMessage(errorMessage)
+                .fileKey(fileKey)
                 .build();
         return importOperationRepository.save(operation);
+    }
+
+    @Transactional(isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRES_NEW)
+    public void updateImportOperationFileKey(int operationId, String fileKey) {
+        importOperationRepository.updateFileKeyById((long) operationId, fileKey);
     }
 
     public List<ImportOperation> getImportHistory(UserRole userRole) {
@@ -113,6 +155,10 @@ public class ImportService {
         return operations.stream()
                 .map(this::mapToImportOperation)
                 .toList();
+    }
+
+    public InputStream getFile(String fileKey) {
+        return fileStorageService.getFile(fileKey);
     }
 
     private ImportOperation mapToImportOperation(ImportOperationEntity entity) {
@@ -131,6 +177,9 @@ public class ImportService {
         }
         if (entity.getErrorMessage() != null) {
             operation.setErrorMessage(entity.getErrorMessage());
+        }
+        if (entity.getFileKey() != null) {
+            operation.setFileKey(entity.getFileKey());
         }
 
         return operation;
