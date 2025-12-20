@@ -41,6 +41,11 @@ export const DragonMenu = ({ children }: DragonMenuInterface) => {
               onClick={() => navigate('/create')}
             />
             <Sidebar.Nav.Section.Item
+              icon={<BsUpload />}
+              label="Import Dragons"
+              onClick={() => navigate('/import')}
+            />
+            <Sidebar.Nav.Section.Item
               icon={<BsHome />}
               label="Main page"
               onClick={() => navigate('/')}

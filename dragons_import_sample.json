@@ -1,0 +1,39 @@
+[
+  {
+    "name": "Import-jmeter",
+    "age": 500,
+    "color": "RED",
+    "type": "FIRE",
+    "coordinates": {
+      "x": 14,
+      "y": 20.0
+    },
+    "cave": {
+      "depth": 1000.0,
+      "numberOfTreasures": 999999
+    },
+    "character": "CUNNING",
+    "head": {
+      "toothCount": 150.0
+    }
+  },
+  {
+    "name": "Importa3333-jmeter",
+    "age": 100,
+    "color": "GREEN",
+    "type": "AIR",
+    "coordinates": {
+      "x": 53.0,
+      "y": 7.5
+    },
+    "cave": {
+      "depth": 200.0,
+      "numberOfTreasures": 500
+    },
+    "character": "WISE",
+    "head": {
+      "toothCount": 80.0
+    }
+  }
+]
+
