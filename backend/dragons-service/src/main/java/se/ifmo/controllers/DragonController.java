@@ -200,6 +200,13 @@ public class DragonController implements DragonsApi {
           .body(resource);
     } catch (Exception e) {
       return ResponseEntity.internalServerError().build();
+    } finally {
+        if (fileStream != null) {
+            try {
+                fileStream.close();
+            } catch (Exception _) {
+            }
+        }
     }
   }
 }
