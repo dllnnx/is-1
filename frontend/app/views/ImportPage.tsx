@@ -178,7 +178,7 @@ export const ImportPage = () => {
                     {new Date(op.createdAt).toLocaleString()}
                   </td>
                   <td className="border border-gray-300 px-4 py-2">
-                    {op.fileKey ? (
+                    {op.fileKey && op.status !== 'FAILED' ? (
                       <DownloadButton operationId={op.id} role={role} />
                     ) : (
                       '—'
