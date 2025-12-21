@@ -175,25 +175,27 @@ public class DragonController implements DragonsApi {
 
   @Override
   public ResponseEntity<Resource> downloadImportFile(Integer operationId, UserRole role) {
-    try {
       se.ifmo.models.UserRole userRole = role == UserRole.ADMIN
-          ? se.ifmo.models.UserRole.ADMIN
-          : se.ifmo.models.UserRole.USER;
-          
+              ? se.ifmo.models.UserRole.ADMIN
+              : se.ifmo.models.UserRole.USER;
+
       List<ImportOperation> history = importService.getImportHistory(userRole);
-      
+
       ImportOperation operation = history.stream()
-          .filter(op -> op.getId().equals(operationId))
-          .findFirst()
-          .orElse(null);
-          
+              .filter(op -> op.getId().equals(operationId))
+              .findFirst()
+              .orElse(null);
+
       if (operation == null || operation.getFileKey() == null) {
-        return ResponseEntity.notFound().build();
+          return ResponseEntity.notFound().build();
       }
-      
-      InputStream fileStream = importService.getFile(operation.getFileKey());
+
+      InputStream fileStream = null;
+
+    try {
+      fileStream = importService.getFile(operation.getFileKey());
       InputStreamResource resource = new InputStreamResource(fileStream);
-      
+
       return ResponseEntity.ok()
           .contentType(MediaType.APPLICATION_OCTET_STREAM)
           .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"import_" + operationId + ".json\"")
@@ -204,7 +206,7 @@ public class DragonController implements DragonsApi {
         if (fileStream != null) {
             try {
                 fileStream.close();
-            } catch (Exception _) {
+            } catch (Exception ignored) {
             }
         }
     }
