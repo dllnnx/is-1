@@ -83,6 +83,7 @@ public class ImportService {
         }
     }
 
+    @Transactional
     public ImportDragonResponse importDragons(List<DragonCreate> dragons, UserRole userRole, String tempFileKey) {
         try {
             int count = performImport(dragons);
@@ -142,7 +143,7 @@ public class ImportService {
         return importOperationRepository.save(operation);
     }
 
-    @Transactional(isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRES_NEW)
+    @Transactional
     public void updateImportOperationFileKey(int operationId, String fileKey) {
         importOperationRepository.updateFileKeyById((long) operationId, fileKey);
     }
