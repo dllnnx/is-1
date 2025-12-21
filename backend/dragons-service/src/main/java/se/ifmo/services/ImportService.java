@@ -7,6 +7,7 @@ import java.util.List;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -24,6 +25,7 @@ import se.ifmo.repositories.ImportOperationRepository;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ImportService {
     private final DragonService dragonService;
     private final ImportOperationRepository importOperationRepository;
@@ -60,6 +62,7 @@ public class ImportService {
         } catch (IOException e) {
             // роллбэк
             if (tempFileKey != null) {
+                log.error("First rollback:{}", String.valueOf(e));
                 fileStorageService.rollbackFileStorage(tempFileKey);
             }
             
@@ -72,6 +75,7 @@ public class ImportService {
         } catch (RuntimeException e) {
             // роллбэк
             if (tempFileKey != null) {
+                log.error("Second rollback:{}", String.valueOf(e));
                 fileStorageService.rollbackFileStorage(tempFileKey);
             }
             
