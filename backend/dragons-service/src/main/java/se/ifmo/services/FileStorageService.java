@@ -5,9 +5,9 @@ import io.minio.errors.*;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import se.ifmo.configurations.MinioProperties;
 
 import java.util.UUID;
 
@@ -17,24 +17,26 @@ import java.util.UUID;
 public class FileStorageService {
 
     private final MinioClient minioClient;
+    private final MinioProperties minioProperties;
 
-    @Value("${minio.bucket-name:import-files}")
-    private String bucketName;
+    public String getBucketName() {
+        return minioProperties.getBucketName();
+    }
 
     @PostConstruct
     public void initializeBucket() {
         try {
             boolean bucketExists = minioClient.bucketExists(BucketExistsArgs.builder()
-                    .bucket(bucketName)
+                    .bucket(getBucketName())
                     .build());
             
             if (!bucketExists) {
                 minioClient.makeBucket(MakeBucketArgs.builder()
-                        .bucket(bucketName)
+                        .bucket(getBucketName())
                         .build());
-                log.info("Created minio bucket: {}", bucketName);
+                log.info("Created minio bucket: {}", getBucketName());
             } else {
-                log.info("minio bucket already exists: {}", bucketName);
+                log.info("minio bucket already exists: {}", getBucketName());
             }
         } catch (Exception e) {
             log.error("Failed to initialize minio bucket", e);
@@ -47,7 +49,7 @@ public class FileStorageService {
             String tempFileKey = "temp/" + UUID.randomUUID() + "_" + file.getOriginalFilename();
             
             minioClient.putObject(PutObjectArgs.builder()
-                    .bucket(bucketName)
+                    .bucket(getBucketName())
                     .object(tempFileKey)
                     .stream(file.getInputStream(), file.getSize(), -1)
                     .contentType(file.getContentType())
@@ -67,16 +69,16 @@ public class FileStorageService {
             String permanentFileKey = UUID.randomUUID() + "_" + originalFilename;
             
             minioClient.copyObject(CopyObjectArgs.builder()
-                    .bucket(bucketName)
+                    .bucket(getBucketName())
                     .object(permanentFileKey)
                     .source(CopySource.builder()
-                            .bucket(bucketName)
+                            .bucket(getBucketName())
                             .object(tempFileKey)
                             .build())
                     .build());
             
             minioClient.removeObject(RemoveObjectArgs.builder()
-                    .bucket(bucketName)
+                    .bucket(getBucketName())
                     .object(tempFileKey)
                     .build());
             
@@ -91,7 +93,7 @@ public class FileStorageService {
     public void rollbackFileStorage(String tempFileKey) {
         try {
             minioClient.removeObject(RemoveObjectArgs.builder()
-                    .bucket(bucketName)
+                    .bucket(getBucketName())
                     .object(tempFileKey)
                     .build());
             
@@ -104,7 +106,7 @@ public class FileStorageService {
     public GetObjectResponse getFile(String fileKey) {
         try {
             return minioClient.getObject(GetObjectArgs.builder()
-                    .bucket(bucketName)
+                    .bucket(getBucketName())
                     .object(fileKey)
                     .build());
         } catch (Exception e) {
