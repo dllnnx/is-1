@@ -3,10 +3,9 @@ package se.ifmo.models;
 import jakarta.persistence.*;
 import java.time.OffsetDateTime;
 import lombok.*;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
+import se.ifmo.annotations.CacheableEntity;
 
 @Entity
 @Table(name = "dragon")
@@ -15,8 +14,7 @@ import org.hibernate.type.SqlTypes;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Cacheable
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@CacheableEntity
 public class DragonEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

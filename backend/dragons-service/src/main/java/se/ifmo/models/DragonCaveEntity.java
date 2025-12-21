@@ -2,8 +2,7 @@ package se.ifmo.models;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
+import se.ifmo.annotations.CacheableEntity;
 
 @Entity
 @Table(name = "dragon_cave")
@@ -12,8 +11,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Cacheable
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@CacheableEntity
 public class DragonCaveEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
