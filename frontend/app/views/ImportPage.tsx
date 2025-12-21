@@ -12,7 +12,7 @@ const DownloadButton = ({ operationId, role }: { operationId: number; role: User
   const handleDownload = async () => {
     setIsLoading(true);
     try {
-      const url = `http://localhost:8090/dragons/import/files/${operationId}?role=${role}`;
+      const url = `${window.location.origin}:8080/dragons/import/files/${operationId}?role=${role}`;
       
       const response = await fetch(url);
       
