@@ -6,15 +6,18 @@ import {
   useImportDragonsMutation,
 } from '~/gen/types.generated';
 
+const base_url = "http://89.169.150.230/";
+
 const DownloadButton = ({ operationId, role }: { operationId: number; role: UserRole }) => {
   const [isLoading, setIsLoading] = useState(false);
   
   const handleDownload = async () => {
     setIsLoading(true);
     try {
-      const url = `${window.location.origin}:8080/dragons/import/files/${operationId}?role=${role}`;
+      const url = `${base_url}/dragons/import/files/${operationId}?role=${role}`;
       
       const response = await fetch(url);
+      console.log("sent");
       
       if (response.ok) {
         const blob = await response.blob();
