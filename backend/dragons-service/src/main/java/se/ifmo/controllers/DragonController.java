@@ -190,7 +190,7 @@ public class DragonController implements DragonsApi {
           return ResponseEntity.notFound().build();
       }
 
-      InputStream fileStream = null;
+      InputStream fileStream;
 
     try {
       fileStream = importService.getFile(operation.getFileKey());
@@ -202,13 +202,6 @@ public class DragonController implements DragonsApi {
           .body(resource);
     } catch (Exception e) {
       return ResponseEntity.internalServerError().build();
-    } finally {
-        if (fileStream != null) {
-            try {
-                fileStream.close();
-            } catch (Exception ignored) {
-            }
-        }
     }
   }
 }
