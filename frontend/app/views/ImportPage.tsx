@@ -6,7 +6,7 @@ import {
   useImportDragonsMutation,
 } from '~/gen/types.generated';
 
-const base_url = "http://89.169.150.230:8080/";
+const base_url = "http://89.169.150.230:8080";
 
 const DownloadButton = ({ operationId, role }: { operationId: number; role: UserRole }) => {
   const [isLoading, setIsLoading] = useState(false);
