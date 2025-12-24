@@ -1,4 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { ImportDragonResponse, UserRole } from '~/gen/types.generated';
 
 const baseQuery = fetchBaseQuery({
   baseUrl: 'http://89.169.150.230:8080/',

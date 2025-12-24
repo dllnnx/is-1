@@ -12,6 +12,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+import se.ifmo.annotations.CacheStats;
 import se.ifmo.exceptions.ConstraintsViolationException;
 import se.ifmo.gen.model.*;
 import se.ifmo.models.*;
@@ -33,12 +34,14 @@ public class DragonService {
     private final DragonSpecificationService specificationService;
     private final ModelMapper modelMapper;
 
+    @CacheStats
     public List<Dragon> getAll() {
         return dragonRepository.findAll().stream()
                 .map(dragonEntity -> modelMapper.map(dragonEntity, Dragon.class))
                 .toList();
     }
 
+    @CacheStats
     public GetDragons200Response getDragonsWithFilters(GetDragonsRequest request) {
         Specification<DragonEntity> spec = specificationService.buildSpecification(request.getDragon());
         Sort sort = specificationService.buildSort(request.getSorting());
@@ -61,20 +64,24 @@ public class DragonService {
                 .totalDragonsCount((int) dragonCount);
     }
 
+    @CacheStats
     public Optional<Dragon> getDragon(Integer id) {
         return dragonRepository
                 .findById(id.longValue())
                 .map(dragonEntity -> modelMapper.map(dragonEntity, Dragon.class));
     }
 
+    @CacheStats
     public Optional<DragonEntity> findById(Long id) {
         return dragonRepository.findById(id);
     }
 
+    @CacheStats
     public int getAgesSum() {
         return dragonRepository.findAll().stream().mapToInt(DragonEntity::getAge).sum();
     }
 
+    @CacheStats
     public Optional<Dragon> getMaxTypeDragon() {
         return dragonRepository.findAll().stream()
                 .max(Comparator.comparingInt(d -> d.getType().getPriority()))
@@ -82,6 +89,7 @@ public class DragonService {
     }
 
     @Transactional(isolation = Isolation.SERIALIZABLE)
+    @CacheStats
     public DragonEntity save(DragonCreate dragonCreate) {
         DragonEntity dragonEntity = modelMapper.map(dragonCreate, DragonEntity.class);
 
@@ -167,6 +175,7 @@ public class DragonService {
         dragonRepository.deleteById(id);
     }
 
+    @CacheStats
     public Optional<Dragon> findDragonByAge(Integer age) {
         return dragonRepository
                 .findFirstByAge(age)

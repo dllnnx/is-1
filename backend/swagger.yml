@@ -567,6 +567,9 @@ components:
         errorMessage:
           type: string
           description: Error message (only for FAILED status)
+        fileKey:
+          type: string
+          description: Key of the imported file in the storage
         createdAt:
           type: string
           format: date-time
@@ -603,6 +606,9 @@ components:
         errorMessage:
           type: string
           description: Error message if import failed
+        fileKey:
+          type: string
+          description: Key of the imported file in the storage
 paths:
   /dragons:
     post:
@@ -952,3 +958,33 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ImportOperation'
+  /dragons/import/files/{operationId}:
+    get:
+      summary: Download import file by operation ID
+      operationId: downloadImportFile
+      tags:
+        - Dragons
+      parameters:
+        - name: operationId
+          in: path
+          description: Import operation ID
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: role
+          in: query
+          description: User role (ADMIN sees all, USER sees only their imports)
+          required: true
+          schema:
+            $ref: '#/components/schemas/UserRole'
+      responses:
+        200:
+          description: OK
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        404:
+          description: File not found

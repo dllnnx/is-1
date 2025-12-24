@@ -167,6 +167,41 @@ public interface DragonsApi {
     }
 
 
+    public static final String PATH_DOWNLOAD_IMPORT_FILE = "/dragons/import/files/{operationId}";
+    /**
+     * GET /dragons/import/files/{operationId} : Download import file by operation ID
+     *
+     * @param operationId Import operation ID (required)
+     * @param role User role (ADMIN sees all, USER sees only their imports) (required)
+     * @return OK (status code 200)
+     *         or File not found (status code 404)
+     */
+    @Operation(
+        operationId = "downloadImportFile",
+        summary = "Download import file by operation ID",
+        tags = { "Dragons" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "OK", content = {
+                @Content(mediaType = "application/octet-stream", schema = @Schema(implementation = org.springframework.core.io.Resource.class))
+            }),
+            @ApiResponse(responseCode = "404", description = "File not found")
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.GET,
+        value = DragonsApi.PATH_DOWNLOAD_IMPORT_FILE,
+        produces = { "application/octet-stream" }
+    )
+    
+    default ResponseEntity<org.springframework.core.io.Resource> downloadImportFile(
+        @Parameter(name = "operationId", description = "Import operation ID", required = true, in = ParameterIn.PATH) @PathVariable("operationId") Integer operationId,
+        @NotNull @Parameter(name = "role", description = "User role (ADMIN sees all, USER sees only their imports)", required = true, in = ParameterIn.QUERY) @Valid @RequestParam(value = "role", required = true) UserRole role
+    ) {
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
     public static final String PATH_GET_CAVES = "/dragons/caves";
     /**
      * GET /dragons/caves : Get all caves
@@ -424,7 +459,7 @@ public interface DragonsApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "[ { \"createdAt\" : \"2000-01-23T04:56:07.000+00:00\", \"errorMessage\" : \"errorMessage\", \"id\" : 0, \"userRole\" : \"ADMIN\", \"addedCount\" : 6, \"status\" : \"SUCCESS\" }, { \"createdAt\" : \"2000-01-23T04:56:07.000+00:00\", \"errorMessage\" : \"errorMessage\", \"id\" : 0, \"userRole\" : \"ADMIN\", \"addedCount\" : 6, \"status\" : \"SUCCESS\" } ]";
+                    String exampleString = "[ { \"createdAt\" : \"2000-01-23T04:56:07.000+00:00\", \"errorMessage\" : \"errorMessage\", \"fileKey\" : \"fileKey\", \"id\" : 0, \"userRole\" : \"ADMIN\", \"addedCount\" : 6, \"status\" : \"SUCCESS\" }, { \"createdAt\" : \"2000-01-23T04:56:07.000+00:00\", \"errorMessage\" : \"errorMessage\", \"fileKey\" : \"fileKey\", \"id\" : 0, \"userRole\" : \"ADMIN\", \"addedCount\" : 6, \"status\" : \"SUCCESS\" } ]";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -586,7 +621,7 @@ public interface DragonsApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"errorMessage\" : \"errorMessage\", \"operationId\" : 0, \"addedCount\" : 6, \"status\" : \"SUCCESS\" }";
+                    String exampleString = "{ \"errorMessage\" : \"errorMessage\", \"operationId\" : 0, \"fileKey\" : \"fileKey\", \"addedCount\" : 6, \"status\" : \"SUCCESS\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }

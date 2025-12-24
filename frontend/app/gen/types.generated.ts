@@ -122,6 +122,17 @@ const injectedRtkApi = api.injectEndpoints({
         },
       }),
     }),
+    downloadImportFile: build.query<
+      DownloadImportFileApiResponse,
+      DownloadImportFileApiArg
+    >({
+      query: (queryArg) => ({
+        url: `/dragons/import/files/${queryArg.operationId}`,
+        params: {
+          role: queryArg.role,
+        },
+      }),
+    }),
   }),
   overrideExisting: false,
 });
@@ -209,6 +220,13 @@ export type ImportDragonsApiArg = {
 export type GetImportHistoryApiResponse =
   /** status 200 OK */ ImportOperation[];
 export type GetImportHistoryApiArg = {
+  /** User role (ADMIN sees all, USER sees only their imports) */
+  role: UserRole;
+};
+export type DownloadImportFileApiResponse = /** status 200 OK */ Blob;
+export type DownloadImportFileApiArg = {
+  /** Import operation ID */
+  operationId: number;
   /** User role (ADMIN sees all, USER sees only their imports) */
   role: UserRole;
 };
@@ -457,6 +475,8 @@ export type ImportOperation = {
   addedCount?: number;
   /** Error message (only for FAILED status) */
   errorMessage?: string;
+  /** Key of the imported file in the storage */
+  fileKey?: string;
   /** When the import operation was created */
   createdAt: string;
 };
@@ -479,4 +499,5 @@ export const {
   useReassignAndDeleteDragonMutation,
   useImportDragonsMutation,
   useGetImportHistoryQuery,
+  useDownloadImportFileQuery,
 } = injectedRtkApi;

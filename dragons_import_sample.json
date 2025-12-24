@@ -1,12 +1,12 @@
 [
   {
-    "name": "Import-jmeter",
-    "age": 500,
+    "name": "MINIOdragon",
+    "age": 6,
     "color": "RED",
     "type": "FIRE",
     "coordinates": {
-      "x": 14,
-      "y": 20.0
+      "x": 13,
+      "y": 0
     },
     "cave": {
       "depth": 1000.0,
@@ -18,12 +18,12 @@
     }
   },
   {
-    "name": "Importa3333-jmeter",
+    "name": "secondMINIO",
     "age": 100,
     "color": "GREEN",
     "type": "AIR",
     "coordinates": {
-      "x": 53.0,
+      "x": 1.0,
       "y": 7.5
     },
     "cave": {

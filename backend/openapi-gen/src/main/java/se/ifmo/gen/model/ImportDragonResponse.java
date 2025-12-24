@@ -32,6 +32,8 @@ public class ImportDragonResponse {
 
   private @Nullable String errorMessage;
 
+  private @Nullable String fileKey;
+
   public ImportDragonResponse() {
     super();
   }
@@ -124,6 +126,26 @@ public class ImportDragonResponse {
     this.errorMessage = errorMessage;
   }
 
+  public ImportDragonResponse fileKey(@Nullable String fileKey) {
+    this.fileKey = fileKey;
+    return this;
+  }
+
+  /**
+   * Key of the imported file in the storage
+   * @return fileKey
+   */
+  
+  @Schema(name = "fileKey", description = "Key of the imported file in the storage", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("fileKey")
+  public @Nullable String getFileKey() {
+    return fileKey;
+  }
+
+  public void setFileKey(@Nullable String fileKey) {
+    this.fileKey = fileKey;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -136,12 +158,13 @@ public class ImportDragonResponse {
     return Objects.equals(this.operationId, importDragonResponse.operationId) &&
         Objects.equals(this.status, importDragonResponse.status) &&
         Objects.equals(this.addedCount, importDragonResponse.addedCount) &&
-        Objects.equals(this.errorMessage, importDragonResponse.errorMessage);
+        Objects.equals(this.errorMessage, importDragonResponse.errorMessage) &&
+        Objects.equals(this.fileKey, importDragonResponse.fileKey);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(operationId, status, addedCount, errorMessage);
+    return Objects.hash(operationId, status, addedCount, errorMessage, fileKey);
   }
 
   @Override
@@ -152,6 +175,7 @@ public class ImportDragonResponse {
     sb.append("    status: ").append(toIndentedString(status)).append("\n");
     sb.append("    addedCount: ").append(toIndentedString(addedCount)).append("\n");
     sb.append("    errorMessage: ").append(toIndentedString(errorMessage)).append("\n");
+    sb.append("    fileKey: ").append(toIndentedString(fileKey)).append("\n");
     sb.append("}");
     return sb.toString();
   }
