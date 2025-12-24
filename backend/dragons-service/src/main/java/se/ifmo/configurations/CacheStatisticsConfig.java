@@ -28,30 +28,27 @@ public class CacheStatisticsConfig {
         this.cacheLoggingProperties = cacheLoggingProperties;
     }
     
-    @Around("@annotation(org.springframework.web.bind.annotation.GetMapping) || " +
-            "@annotation(org.springframework.web.bind.annotation.PostMapping) || " +
-            "@annotation(org.springframework.web.bind.annotation.PutMapping) || " +
-            "@annotation(org.springframework.web.bind.annotation.DeleteMapping)")
+    @Around("@annotation(se.ifmo.annotations.CacheStats)")
     public Object logCacheStatistics(ProceedingJoinPoint joinPoint) throws Throwable {
         if (!cacheLoggingProperties.isEnabled()) {
             return joinPoint.proceed();
         }
-        
+
         Statistics stats = entityManagerFactory
                 .unwrap(org.hibernate.SessionFactory.class)
                 .getStatistics();
 
         if (stats.isStatisticsEnabled()) {
-            logger.info("Cache statistics before request - Hits: {}, Misses: {}, Put count: {}", 
+            logger.info("Cache statistics before request - Hits: {}, Misses: {}, Put count: {}",
                        stats.getSecondLevelCacheHitCount(),
                        stats.getSecondLevelCacheMissCount(),
                        stats.getSecondLevelCachePutCount());
         }
-        
+
         Object result = joinPoint.proceed();
-        
+
         if (stats.isStatisticsEnabled()) {
-            logger.info("Cache statistics after request - Hits: {}, Misses: {}, Put count: {}", 
+            logger.info("Cache statistics after request - Hits: {}, Misses: {}, Put count: {}",
                        stats.getSecondLevelCacheHitCount(),
                        stats.getSecondLevelCacheMissCount(),
                        stats.getSecondLevelCachePutCount());

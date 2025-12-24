@@ -2,9 +2,10 @@ package se.ifmo.models;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
-import se.ifmo.annotations.CacheableEntity;
+import org.springframework.cache.annotation.Cacheable;
 
 @Entity
 @Table(name = "person")
@@ -13,7 +14,8 @@ import se.ifmo.annotations.CacheableEntity;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@CacheableEntity
+@Cacheable("default")
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class PersonEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
